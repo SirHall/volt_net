@@ -8,60 +8,67 @@
 
 #include <poll.h>
 
-class listener
+namespace volt::listener
 {
-  private:
-    sockaddr_in addr;
-    int         socket_fd = 0;
-    uint16_t    port      = 0;
-    pollfd      poll_fd;
-    int         backlog = 10;
-
-    void open_socket()
+    class listener
     {
-        // Get the socket file descriptor for the new socket
-        socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+      private:
+        sockaddr_in addr;
+        int         socket_fd = 0;
+        uint16_t    port      = 0;
+        pollfd      poll_fd;
+        int         backlog = 10;
 
-        // Setup polling so we can check for new connections
-        poll_fd.fd     = socket_fd;
-        poll_fd.events = POLLOUT | POLLWRBAND;
-
-        // Addr settings
-        addr.sin_family      = AF_INET; // TCP
-        addr.sin_port        = htons(port);
-        addr.sin_addr.s_addr = INADDR_ANY;
-
-        // Bind this file descriptor to a port
-        if (bind(socket_fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+        void open_socket()
         {
-            // TODO: Handle error
+            // Get the socket file descriptor for the new socket
+            socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+            // Setup polling so we can check for new connections
+            poll_fd.fd     = socket_fd;
+            poll_fd.events = POLLOUT | POLLWRBAND;
+
+            // Addr settings
+            addr.sin_family      = AF_INET; // TCP
+            addr.sin_port        = htons(port);
+            addr.sin_addr.s_addr = INADDR_ANY;
+
+            // Bind this file descriptor to a port
+            if (bind(socket_fd, (sockaddr *)&addr, sizeof(addr)) < 0)
+            {
+                // TODO: Handle error
+            }
+
+            if (listen(socket_fd, backlog) == -1)
+            {
+                // TODO: Handle error
+            }
         }
 
-        if (listen(socket_fd, backlog) == -1)
+      public:
+        listener() { open_socket(); }
+        ~listener() {}
+
+        // Check for any new connection requests
+        // returns: true = new connection waiting
+        bool new_connection()
         {
-            // TODO: Handle error
+            poll(&poll_fd, 1, 0);
+            return poll_fd.revents & (POLLWRBAND | POLLOUT);
         }
-    }
 
-  public:
-    listener() { open_socket(); }
-    ~listener() {}
+        // Accepts the new connection
+        // return: new connection file descriptor. -1 on failure
+        int accept_new_connection()
+        {
+            // TODO: Do something with this
+            sockaddr_in new_addr;
+            socklen_t   len;
 
-    // Check for any new connection requests
-    // returns: true = new connection waiting
-    bool new_connection()
-    {
-        poll(&poll_fd, 1, 0);
-        return poll_fd.revents & (POLLWRBAND | POLLOUT);
-    }
+            int conn_fd = accept(socket_fd, (sockaddr *)&new_addr, &len);
 
-    // Accepts the new connection
-    // return: new connection file descriptor. -1 on failure
-    int accept_new_connection()
-    {
-        // TODO: Actually store and return the addr structure and addr length
-        int conn_fd = accept(socket_fd, nullptr, nullptr);
-    }
-};
-
+            return conn_fd;
+        }
+    };
+} // namespace volt::listener
 #endif
