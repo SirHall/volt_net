@@ -10,8 +10,10 @@ namespace volt
 {
     class message : public std::vector<net_word>
     {
+      public:
+        message()  = default;
+        ~message() = default;
         template <typename T>
-
         void write(T const &v)
         {
             write_into(v, this);

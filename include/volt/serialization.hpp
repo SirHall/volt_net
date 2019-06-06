@@ -15,7 +15,7 @@ namespace volt::serialize
     {
         auto data = std::vector<net_word>();
         write_into(v, data);
-        1 return data;
+        return data;
     }
 
     template <typename T>
@@ -25,10 +25,10 @@ namespace volt::serialize
         // copy over the memory data
         constexpr auto array_len = sizeof(T) / sizeof(net_word);
 
-        const prev_size = data.size();
+        const auto prev_size = data.size();
         data.resize(data.size() + array_len);
         // No clue how safe this is, but it works
-        memcpy(data.begin() + prev_size, v, sizeof(T));
+        memcpy(&*(data.begin() + prev_size), &v, sizeof(T));
     }
 
     template <typename T>
@@ -44,7 +44,7 @@ namespace volt::serialize
 namespace volt::deserialize
 {
     template <typename T>
-    T *read_new(message_iter &iterator)
+    T *read_new(volt::message_iter &iterator)
     {
         T *instance = new T();
         read_into(iterator, *instance);
@@ -56,9 +56,9 @@ namespace volt::deserialize
     {
         // If no specialization if made for a class, just memcopy it into
         // a new instance of that class
-        memcpy(&instance, iterator, sizeof(T));
+        memcpy(&instance, &*iterator, sizeof(T));
 
-        message_iter += sizeof(T) / sizeof(net_word);
+        iterator += sizeof(T) / sizeof(net_word);
     }
 
     template <typename T>
@@ -77,8 +77,8 @@ namespace volt::deserialize
         constexpr auto array_len =
             sizeof(message_array_size) / sizeof(net_word);
 
-        message_iter += len;
-        array.reserve(array.size() + len);
+        iterator += array_len;
+        array.reserve(array.size() + array_len);
 
         for (message_array_size i = 0; i < array_size; i++)
             array.push_back(read_new<T>(*iterator));
