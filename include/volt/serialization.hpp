@@ -34,7 +34,8 @@ namespace volt::serialize
     template <typename T>
     void write_into_array(std::vector<T> const &v, std::vector<net_word> &data)
     {
-        data.push_back((message_array_size)v.size());
+        // data.push_back((message_array_size)v.size());
+        write_into<message_array_size>((message_array_size)v.size(), data);
         for (T value : v)
             write_into(value, data);
     }
@@ -43,14 +44,6 @@ namespace volt::serialize
 
 namespace volt::deserialize
 {
-    template <typename T>
-    T *read_new(volt::message_iter &iterator)
-    {
-        T *instance = new T();
-        read_into(iterator, *instance);
-        return instance;
-    }
-
     template <typename T>
     void read_into(message_iter &iterator, T &instance)
     {
@@ -62,26 +55,29 @@ namespace volt::deserialize
     }
 
     template <typename T>
-    std::vector<T> *read_new_array(message_iter &iterator)
+    T *read_new(volt::message_iter &iterator)
     {
-        std::vector<T> *array = new std::vector<T>();
-        read_into_array(iterator, *array);
-        return array;
+        T *instance = new T();
+        read_into(iterator, *instance);
+        return instance;
     }
 
     template <typename T>
     void read_into_array(message_iter &iterator, std::vector<T> &array)
     {
         message_array_size array_size = *read_new<message_array_size>(iterator);
-
-        constexpr auto array_len =
-            sizeof(message_array_size) / sizeof(net_word);
-
-        iterator += array_len;
-        array.reserve(array.size() + array_len);
+        array.reserve(array.size() + array_size);
 
         for (message_array_size i = 0; i < array_size; i++)
-            array.push_back(read_new<T>(*iterator));
+            array.push_back(*read_new<T>(iterator));
+    }
+
+    template <typename T>
+    std::vector<T> *read_new_array(message_iter &iterator)
+    {
+        std::vector<T> *array = new std::vector<T>();
+        read_into_array(iterator, *array);
+        return array;
     }
 
 } // namespace volt::deserialize
