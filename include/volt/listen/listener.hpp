@@ -2,11 +2,13 @@
 #ifndef listener_hpp
 #define listener_hpp
 
+#include "volt/connection.hpp"
+#include "volt/protocols/protocol.hpp"
+#include "volt/protocols/tcp_protocol.hpp"
 #include <netinet/in.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-
-#include <poll.h>
 
 namespace volt::listener
 {
@@ -59,15 +61,23 @@ namespace volt::listener
 
         // Accepts the new connection
         // return: new connection file descriptor. -1 on failure
-        int accept_new_connection()
+        std::vector<connection> *accept_new_connection()
         {
-            // TODO: Do something with this
-            sockaddr_in new_addr;
-            socklen_t   len;
+            auto new_cons = new std::vector<connection>();
 
-            int conn_fd = accept(socket_fd, (sockaddr *)&new_addr, &len);
+            while (new_connection())
+            {
+                sockaddr_in new_addr;
+                socklen_t   len;
 
-            return conn_fd;
+                int conn_fd = accept(socket_fd, (sockaddr *)&new_addr, &len);
+
+                connection new_con = connection();
+                // new_con
+
+                // TODO: Setup the connection
+                // auto tcp_prot = volt::protocol::tcp_protocol();
+            }
         }
     };
 } // namespace volt::listener

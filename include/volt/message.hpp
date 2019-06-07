@@ -11,13 +11,21 @@ namespace volt
     class message : public std::vector<net_word>
     {
       private:
-        volt::message_iter iter;
+        volt::message_iter  iter;
+        const volt::net_tag tag;
 
       public:
-        message() { reset_iterator(); }
+        message(volt::net_tag msg_tag) : tag(msg_tag)
+        {
+            this->write<volt::net_tag>(msg_tag);
+        }
+
         ~message() = default;
 
         void reset_iterator() { iter = begin(); }
+
+        void *      get_buffer() const { return (void *)&(*this->begin()); }
+        std::size_t get_buffer_len() const { return this->size(); }
 
         template <typename T>
         void write(T const &v)

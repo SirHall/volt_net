@@ -2,7 +2,16 @@
 #ifndef protocol_hpp
 #define protocol_hpp
 
+#include "volt/defs.hpp"
+#include <netinet/in.h>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+namespace volt
+{
+    class message;
+}
 
 namespace volt::protocol
 {
@@ -13,7 +22,9 @@ namespace volt::protocol
 
         virtual unsigned char prot_id();
 
-        virtual void initialize();
+        virtual void send_msg(volt::message &m);
+
+        std::vector<volt::message> *recieve_msg();
     };
 } // namespace volt::protocol
 

@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     test t = test();
 
-    auto m = volt::message();
+    auto m = volt::message(0);
 
     m.write<test>(t);
 
