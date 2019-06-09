@@ -39,7 +39,6 @@ namespace volt::serialize
         for (T value : v)
             write_into(value, data);
     }
-
 } // namespace volt::serialize
 
 namespace volt::deserialize
@@ -49,8 +48,7 @@ namespace volt::deserialize
     {
         // If no specialization if made for a class, just memcopy it into
         // a new instance of that class
-        memcpy(&instance, &*iterator, sizeof(T));
-
+        memcpy(&instance, &(*iterator), sizeof(T));
         iterator += sizeof(T) / sizeof(net_word);
     }
 
@@ -65,11 +63,16 @@ namespace volt::deserialize
     template <typename T>
     void read_into_array(message_iter &iterator, std::vector<T> &array)
     {
-        message_array_size array_size = *read_new<message_array_size>(iterator);
+        message_array_size array_size;
+        read_into<message_array_size>(iterator, array_size);
         array.reserve(array.size() + array_size);
 
         for (message_array_size i = 0; i < array_size; i++)
-            array.push_back(*read_new<T>(iterator));
+        {
+            T val;
+            read_into<T>(iterator, val);
+            array.push_back(val);
+        }
     }
 
     template <typename T>

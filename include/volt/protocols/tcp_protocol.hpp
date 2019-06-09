@@ -29,7 +29,7 @@ namespace volt::protocol
 
         ~tcp_protocol() { delete addr; };
 
-        unsigned char prot_id() { return 0; }
+        volt::prot_identifier prot_id() { return 0; }
 
         void initialize() {}
 
@@ -41,24 +41,31 @@ namespace volt::protocol
         bool new_msgs()
         {
             poll(&poll_fd, 1, 0);
-            return poll_fd.revents & (POLLWRBAND | POLLOUT);
+            return (poll_fd.revents & (POLLWRBAND | POLLOUT)) > 0;
         }
 
-        std::vector<volt::message> *recieve_msg()
+        std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>
+            recieve_msg()
         {
-            auto msgs = new std::vector<volt::message>();
+            auto msgs =
+                std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>(
+                    new std::vector<std::unique_ptr<volt::message>>());
+
+            int i = 0;
+
             while (new_msgs())
             {
 
-                auto buff = std::vector<net_word>(volt::buffer_size, 0);
+                auto msg = std::make_unique<volt::message>();
+                msg->resize(volt::buffer_size);
+                recv(con_fd, msg->data(), volt::buffer_mem_size, 0);
+                msgs->push_back(std::move(msg));
 
-                recv(con_fd, buff.data(), volt::buffer_size, 0);
-
-                volt::net_tag tag = ((net_tag *)buff.data())[0];
-                auto          msg = volt::message(tag);
-                msg.swap(buff);
-                msgs->push_back(msg);
-                // Do not use in_buff anymore!
+                if (i > 5)
+                {
+                    std::cout << "i > 0" << std::endl;
+                    break;
+                }
             }
             return msgs;
         }

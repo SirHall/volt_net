@@ -1,0 +1,6 @@
+#!/bin/bash
+flags="-Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wno-unused-parameter -Iinclude -O3 -ffast-math -flto -std=c++17"
+(g++ -o ./bin/server ./tests/server/server.cpp $flags) && \
+(g++ -o ./bin/client ./tests/client/client.cpp $flags)
+#./bin/server &
+#./bin/client

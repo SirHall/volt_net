@@ -17,7 +17,7 @@ namespace volt::listener
       private:
         sockaddr_in addr;
         int         socket_fd = 0;
-        uint16_t    port      = 0;
+        uint16_t    port      = 64423;
         pollfd      poll_fd;
         int         backlog = 10;
 
@@ -61,23 +61,29 @@ namespace volt::listener
 
         // Accepts the new connection
         // return: new connection file descriptor. -1 on failure
-        std::vector<connection> *accept_new_connection()
+        std::unique_ptr<std::vector<std::unique_ptr<connection>>>
+            accept_new_connection()
         {
-            auto new_cons = new std::vector<connection>();
+            auto new_cons =
+                std::unique_ptr<std::vector<std::unique_ptr<connection>>>(
+                    new std::vector<std::unique_ptr<connection>>());
 
-            while (new_connection())
-            {
-                sockaddr_in new_addr;
-                socklen_t   len;
+            // while (new_connection())
+            // {
+            sockaddr_in *new_addr = new sockaddr_in();
+            socklen_t *  len      = new socklen_t();
 
-                int conn_fd = accept(socket_fd, (sockaddr *)&new_addr, &len);
+            int conn_fd = accept(socket_fd, (sockaddr *)new_addr, len);
 
-                connection new_con = connection();
-                // new_con
+            auto new_con = std::make_unique<connection>();
 
-                // TODO: Setup the connection
-                // auto tcp_prot = volt::protocol::tcp_protocol();
-            }
+            auto tcp_prot = std::make_unique<volt::protocol::tcp_protocol>(
+                (sockaddr *)new_addr, *len, conn_fd);
+            new_con->add_protocol(std::move(tcp_prot));
+            new_cons->push_back(std::move(new_con));
+            // }
+
+            return new_cons;
         }
     };
 } // namespace volt::listener

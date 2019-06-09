@@ -19,6 +19,8 @@ namespace volt
     typedef unsigned int message_array_size;
 
     typedef std::vector<net_word>::iterator message_iter;
+
+    typedef unsigned char prot_identifier;
 } // namespace volt
 
 #endif

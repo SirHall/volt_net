@@ -50,16 +50,5 @@ int main(int argc, char *argv[])
     for (auto e : *back_array)
         std::cout << e.a << " " << e.b << " " << e.c << std::endl;
 
-    // volt::serialize::write_into();
-
-    // auto l = volt::listener::listener();
-
-    // while (true)
-    // {
-    //     std::cout << (l.new_connection() ? "true" : "false") <<
-    //     std::endl;
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // }
-
     return 0;
 }

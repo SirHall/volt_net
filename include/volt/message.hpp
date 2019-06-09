@@ -4,6 +4,7 @@
 
 #include "volt/defs.hpp"
 #include "volt/serialization.hpp"
+#include "volt/serialization_ext.hpp"
 #include <vector>
 
 namespace volt
@@ -11,14 +12,17 @@ namespace volt
     class message : public std::vector<net_word>
     {
       private:
-        volt::message_iter  iter;
-        const volt::net_tag tag;
+        volt::message_iter iter;
+        // const volt::net_tag tag;
 
       public:
-        message(volt::net_tag msg_tag) : tag(msg_tag)
-        {
-            this->write<volt::net_tag>(msg_tag);
-        }
+        // message(volt::net_tag msg_tag) : tag(msg_tag)
+        // {
+        //     this->write<volt::net_tag>(msg_tag);
+        //     this->reset_iterator();
+        // }
+
+        message() { this->reset_iterator(); }
 
         ~message() = default;
 
@@ -36,7 +40,7 @@ namespace volt
         template <typename T>
         void write_array(std::vector<T> &array)
         {
-            volt::serialize::write_into_array(array, *this);
+            volt::serialize::write_into_array<T>(array, *this);
         }
 
         template <typename T>
