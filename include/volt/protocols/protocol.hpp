@@ -12,7 +12,7 @@
 namespace volt
 {
     class message;
-}
+} // namespace volt
 
 namespace volt::protocol
 {
@@ -25,8 +25,7 @@ namespace volt::protocol
 
         virtual void send_msg(volt::message const &m) = 0;
 
-        virtual std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>
-            recieve_msg() = 0;
+        virtual volt::message_ptr recieve_msg() = 0;
     };
 } // namespace volt::protocol
 
