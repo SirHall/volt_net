@@ -1,0 +1,3 @@
+[submodule "dep/endian_h"]
+	path = dep/endian_h
+	url = https://github.com/mikepb/endian.h.git
