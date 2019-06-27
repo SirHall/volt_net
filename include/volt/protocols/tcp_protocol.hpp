@@ -5,6 +5,7 @@
 #include "volt/defs.hpp"
 #include "volt/message.hpp"
 #include "volt/protocols/protocol.hpp"
+#include <cstdint>
 #include <poll.h>
 
 namespace volt::protocol
@@ -12,10 +13,36 @@ namespace volt::protocol
     class tcp_protocol : public protocol
     {
       private:
-        const sockaddr *addr;
-        const socklen_t len;
-        const int       con_fd;
-        pollfd          poll_fd;
+        const sockaddr *            addr;
+        const socklen_t             len;
+        const int                   con_fd;
+        pollfd                      poll_fd;
+        std::vector<volt::net_word> buff;
+
+        volt::message_iter iter;
+
+        void recieve_next_buf()
+        {
+            recv(con_fd, buff.data(), volt::max_buffer_size, 0);
+            iter = buff.begin();
+        }
+
+        volt::net_word get_next_byte()
+        {
+            if (iter == buff.end())
+                recieve_next_buf();
+            auto val = *iter;
+            iter++;
+            return val;
+        }
+
+        volt::net_word *get_next_bytes(std::size_t count)
+        {
+            volt::net_word *alloc_mem = (volt::net_word *)malloc(count);
+            for (std::size_t i = 0; i < count; i++)
+                alloc_mem[i] = get_next_byte();
+            return alloc_mem;
+        }
 
       public:
         tcp_protocol(sockaddr *socket, socklen_t length,
@@ -25,9 +52,10 @@ namespace volt::protocol
             // Setup polling so we can check for new messages
             poll_fd.fd     = con_fd;
             poll_fd.events = POLLOUT | POLLWRBAND;
+            buff.resize(volt::max_buffer_size);
         }
 
-        ~tcp_protocol() { delete addr; };
+        ~tcp_protocol() { delete addr; }
 
         volt::prot_identifier prot_id() { return 0; }
 
@@ -44,30 +72,37 @@ namespace volt::protocol
             return (poll_fd.revents & (POLLWRBAND | POLLOUT)) > 0;
         }
 
-        std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>
-            recieve_msg()
+        volt::message_ptr recieve_msg()
         {
-            auto msgs =
-                std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>(
-                    new std::vector<std::unique_ptr<volt::message>>());
+            volt::message_ptr msg  = volt::message_ptr(new volt::message());
+            auto              iter = msg->begin();
 
-            int i = 0;
+            // Get message length
+            volt::buffer_size msg_len = 0;
+            volt::deserialize::unsafe::read_into_raw(msg_len, &*iter);
 
-            while (new_msgs())
+            // current_size == msg_len must be true
+            volt::buffer_size current_size = 0;
+            while (true)
             {
+                net_word b = get_next_byte();
+                current_size++;
 
-                auto msg = std::make_unique<volt::message>();
-                msg->resize(volt::buffer_size);
-                recv(con_fd, msg->data(), volt::buffer_mem_size, 0);
-                msgs->push_back(std::move(msg));
-
-                if (i > 5)
+                if (b == volt::escape_val) // This is an escape sequence
                 {
-                    std::cout << "i > 0" << std::endl;
-                    break;
+                    net_word next = get_next_byte();
+                    current_size++;
+                    // This is the original character (escap evalue)
+                    if (next == volt::msg_origi_char) {}
+                    // This is the end of the message
+                    if (next == volt::msg_end_escaped)
+                    {
+                        break;
+                    }
                 }
+                msg->push_back(b);
             }
-            return msgs;
+            return msg;
         }
     };
 } // namespace volt::protocol
