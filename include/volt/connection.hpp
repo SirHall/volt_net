@@ -69,8 +69,7 @@ namespace volt
             protocols[prot_id]->send_msg(m);
         }
 
-        std::unique_ptr<std::vector<std::unique_ptr<volt::message>>>
-            recieve_messages(volt::prot_identifier prot_id)
+        volt::message_ptr recieve_messages(volt::prot_identifier prot_id)
         {
             return std::move(protocols[prot_id]->recieve_msg());
         }
