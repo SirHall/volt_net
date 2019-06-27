@@ -3,6 +3,8 @@
 #define serialization_hpp
 
 #include "volt/defs.hpp"
+#include "volt/endian.hpp"
+#include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
@@ -11,33 +13,24 @@ namespace volt::serialize
 {
 
     template <typename T>
-    std::vector<net_word> write_new(T const &v)
+    volt::message_ptr write_new(T const &v)
     {
-        auto data = std::vector<net_word>();
+        auto data = std::make_unique<volt::message_t>();
         write_into(v, data);
         return data;
     }
 
+    // Serialization must be defined for ALL objects
     template <typename T>
-    void write_into(T const &v, std::vector<net_word> &data)
-    {
-        // For any type without an explicit specialization, just pretty much
-        // copy over the memory data
-        constexpr auto array_len = sizeof(T) / sizeof(net_word);
-
-        const auto prev_size = data.size();
-        data.resize(data.size() + array_len);
-        // No clue how safe this is, but it works
-        memcpy(&*(data.begin() + prev_size), &v, sizeof(T));
-    }
+    void write_into(T const &v, volt::message_ptr &data);
 
     template <typename T>
-    void write_into_array(std::vector<T> const &v, std::vector<net_word> &data)
+    void write_into_array(std::vector<T> const &v, volt::message_ptr &data,
+                          bool write_size = true)
     {
-        // data.push_back((message_array_size)v.size());
-        write_into<message_array_size>((message_array_size)v.size(), data);
-        for (T value : v)
-            write_into(value, data);
+        write_into<volt::buffer_size>(v.size(), data);
+        for (T inst : v)
+            write_into<T>(inst, data);
     }
 } // namespace volt::serialize
 
@@ -46,10 +39,6 @@ namespace volt::deserialize
     template <typename T>
     void read_into(message_iter &iterator, T &instance)
     {
-        // If no specialization if made for a class, just memcopy it into
-        // a new instance of that class
-        memcpy(&instance, &(*iterator), sizeof(T));
-        iterator += sizeof(T) / sizeof(net_word);
     }
 
     template <typename T>
