@@ -2,22 +2,22 @@
 #ifndef msg_writer_hpp
 #define msg_writer_hpp
 
-#include "volt/messages/msg_send.hpp"
+#include "volt/message.hpp"
 #include "volt/serialization.hpp"
 #include <memory>
 
-namespace volt::net::msg
+namespace volt
 {
     class msg_writer
     {
       private:
-        std::unique_ptr<msg_send> msg;
+        volt::message_ptr msg;
 
       public:
         msg_writer()
         {
-            // TODO: Get msg_send instance from central queue
-            msg = make_unique<msg_send>();
+            // TODO: Get message instance from central queue
+            msg = volt::make_message();
 
             msg->resize(0);
         }
@@ -25,9 +25,18 @@ namespace volt::net::msg
         {
             // TODO: Give the message back to the central queue
 
-            volt::serialize::write_end();
+            // volt::serialize::write_end(msg);
         }
-    }
-} // namespace volt::net::msg
+
+        template <typename T>
+        void write_msg(T const &instance)
+        {
+            volt::serialize::write_into<T>(instance, msg);
+        }
+
+        // Temporary
+        volt::message_ptr &get_msg() { return std::ref(msg); }
+    };
+} // namespace volt
 
 #endif
