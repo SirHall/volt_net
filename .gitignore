@@ -11,5 +11,7 @@ build/
 bin/
 *.o
 
+.clang_complete
+
 .vscode/
 out
