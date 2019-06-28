@@ -23,7 +23,7 @@ namespace volt::protocol
 
         virtual volt::prot_identifier prot_id() = 0;
 
-        virtual void send_msg(volt::message const &m) = 0;
+        virtual void send_msg(volt::message_ptr const &m) = 0;
 
         virtual volt::message_ptr recieve_msg() = 0;
     };
