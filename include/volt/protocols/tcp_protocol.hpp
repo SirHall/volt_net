@@ -18,6 +18,7 @@ namespace volt::protocol
         const int                   con_fd;
         pollfd                      poll_fd;
         std::vector<volt::net_word> buff;
+        std::vector<volt::net_word> send_buff;
 
         volt::message_iter iter;
 
@@ -33,6 +34,7 @@ namespace volt::protocol
                 recieve_next_buf();
             auto val = *iter;
             iter++;
+            std::cout << "Next byte: " << (int)val << std::endl;
             return val;
         }
 
@@ -52,7 +54,9 @@ namespace volt::protocol
             // Setup polling so we can check for new messages
             poll_fd.fd     = con_fd;
             poll_fd.events = POLLOUT | POLLWRBAND;
-            buff.resize(volt::max_buffer_size);
+            buff.reserve(volt::max_buffer_size);
+            send_buff.reserve(volt::max_buffer_size);
+            iter = buff.begin();
         }
 
         ~tcp_protocol() { delete addr; }
@@ -61,9 +65,24 @@ namespace volt::protocol
 
         void initialize() {}
 
-        void send_msg(volt::message const &m)
+        void send_msg(volt::message_ptr const &m)
         {
-            send(con_fd, m.get_buffer(), m.get_buffer_len(), 0);
+            send_buff.resize(0);
+            for (std::size_t i = 0; i < m->size(); i++)
+            {
+                send_buff.push_back(m->at(i));
+                if (m->at(i) == volt::escape_val)
+                    send_buff.push_back(volt::msg_origi_char);
+            }
+
+            send_buff.push_back(volt::escape_val);
+            send_buff.push_back(volt::msg_end_escaped);
+
+            std::cout << "Sending:";
+            for (std::size_t i = 0; i < send_buff.size(); i++)
+                std::cout << " " << (unsigned int)send_buff.at(i);
+            std::cout << std::endl;
+            send(con_fd, send_buff.data(), send_buff.size(), 0);
         }
 
         bool new_msgs()
@@ -74,12 +93,7 @@ namespace volt::protocol
 
         volt::message_ptr recieve_msg()
         {
-            volt::message_ptr msg  = volt::message_ptr(new volt::message());
-            auto              iter = msg->begin();
-
-            // Get message length
-            volt::buffer_size msg_len = 0;
-            volt::deserialize::unsafe::read_into_raw(msg_len, &*iter);
+            volt::message_ptr msg = volt::message_ptr(new volt::message());
 
             // current_size == msg_len must be true
             volt::buffer_size current_size = 0;
@@ -92,13 +106,11 @@ namespace volt::protocol
                 {
                     net_word next = get_next_byte();
                     current_size++;
-                    // This is the original character (escap evalue)
+                    // This is the original character (escape value)
                     if (next == volt::msg_origi_char) {}
                     // This is the end of the message
                     if (next == volt::msg_end_escaped)
-                    {
                         break;
-                    }
                 }
                 msg->push_back(b);
             }
