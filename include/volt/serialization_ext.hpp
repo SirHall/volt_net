@@ -5,22 +5,16 @@
 #include "volt/defs.hpp"
 #include "volt/serialization.hpp"
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace volt::serialize
 {
-    void write_end(std::vector<net_word> &data)
-    {
-        data.push_back(escape_val);
-        data.push_back(msg_end_escaped);
-    }
-
     template <>
     void write_into(net_word const &v, volt::message_ptr &data)
     {
+        std::cout << "Write: " << (int)v << std::endl;
         data->push_back(v);
-        // if (v == volt::escape_val)
-        //     data->push_back(volt::msg_origi_char);
     }
 
     // This function is declared below
@@ -40,11 +34,11 @@ namespace volt::serialize
             for (auto it = begin; it < end; it++)
                 write_into<net_word>(*it, data);
         else
-            for (auto it = end; begin < it; it--)
+            for (auto it = end - 1; it >= begin; it--)
                 write_into<net_word>(*it, data);
     }
 
-    // #pragma region Primitive Integers
+#pragma region Primitive Integers
 
     //     template <>
     //     void write_into(unsigned char const &v, volt::message_ptr &data)
@@ -112,56 +106,50 @@ namespace volt::serialize
     //                          false);
     //     }
 
-    // #pragma endregion
+#pragma endregion
 
 #pragma region Safe Integers
 
     template <>
     void write_into(std::uint16_t const &v, volt::message_ptr &data)
     {
-        std::uint16_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::uint16_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint16_t),
+                         data, false);
     }
 
     template <>
     void write_into(std::int16_t const &v, volt::message_ptr &data)
     {
-        std::int16_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::int16_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int16_t),
+                         data, false);
     }
 
     template <>
     void write_into(std::uint32_t const &v, volt::message_ptr &data)
     {
-        std::uint32_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::uint32_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint32_t),
+                         data, false);
     }
 
     template <>
     void write_into(std::int32_t const &v, volt::message_ptr &data)
     {
-        std::int32_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::int32_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int32_t),
+                         data, false);
     }
 
     template <>
     void write_into(std::uint64_t const &v, volt::message_ptr &data)
     {
-        std::uint64_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::uint64_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint64_t),
+                         data, false);
     }
 
     template <>
     void write_into(std::int64_t const &v, volt::message_ptr &data)
     {
-        std::int64_t n = v;
-        write_into_array((net_word *)&n,
-                         (net_word *)(&n + sizeof(std::int64_t)), data, false);
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int64_t),
+                         data, false);
     }
 
 #pragma endregion
@@ -195,15 +183,20 @@ namespace volt::deserialize
 
     namespace unsafe
     {
-        void *net_to_host_endian(void *ptr, std::size_t size)
+        void *net_to_host_endian(void *ptr, std::size_t size,
+                                 void *dest_ptr = nullptr)
         {
             if (volt::net::is_be)
                 return ptr;
 
             // Host is little endian, write in backwards
-            char *mem = (char *)std::malloc(size);
+            char *char_dest_ptr;
+            if (dest_ptr == nullptr)
+                char_dest_ptr = (char *)std::malloc(size);
+            else
+                char_dest_ptr = (char *)dest_ptr;
             for (std::size_t i = 0; i < size; i++)
-                mem[i] = ((char *)ptr)[(size - 1) - i];
+                char_dest_ptr[i] = ((char *)ptr)[(size - 1) - i];
             return ptr;
         }
 
@@ -246,6 +239,27 @@ namespace volt::deserialize
         for (char c : char_vec)
             instance += c;
     }
+
+    // template <>
+    // void read_into(message_iter &iterator, volt::net_word &instance)
+    // {
+    //     instance = *iterator;
+    //     iterator++;
+    // }
+
+#pragma region Safe Integers
+
+    template <typename T>
+    void read_into_int(message_iter &iterator, T &instance)
+    {
+        static_assert(std::is_integral<T>(), "T must be of an integer type");
+        volt::deserialize::unsafe::net_to_host_endian(&*iterator, sizeof(T),
+                                                      &instance);
+        iterator += sizeof(T);
+    }
+
+#pragma endregion
+
 } // namespace volt::deserialize
 
 #endif

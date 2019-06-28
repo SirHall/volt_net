@@ -11,7 +11,6 @@
 
 namespace volt::serialize
 {
-
     template <typename T>
     volt::message_ptr write_new(T const &v)
     {
@@ -37,9 +36,7 @@ namespace volt::serialize
 namespace volt::deserialize
 {
     template <typename T>
-    void read_into(message_iter &iterator, T &instance)
-    {
-    }
+    void read_into(message_iter &iterator, T &instance);
 
     template <typename T>
     T *read_new(volt::message_iter &iterator)
