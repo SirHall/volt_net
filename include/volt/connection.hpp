@@ -63,8 +63,7 @@ namespace volt
             return protocols.count(prot_id) > 0;
         }
 
-        // TODO: Find some clean way to specify which protocol to use
-        void send_message(message &m, volt::prot_identifier prot_id)
+        void send_message(volt::message_ptr &m, volt::prot_identifier prot_id)
         {
             protocols[prot_id]->send_msg(m);
         }
