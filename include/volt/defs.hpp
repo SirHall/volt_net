@@ -28,6 +28,12 @@ namespace volt
     typedef std::vector<net_word>                  message_t;
     typedef std::unique_ptr<std::vector<net_word>> message_ptr;
 
+    // Returns a new instance of a message pointer
+    message_ptr make_message()
+    {
+        return std::make_unique<std::vector<net_word>>();
+    }
+
     typedef std::uint8_t prot_identifier;
 } // namespace volt
 
