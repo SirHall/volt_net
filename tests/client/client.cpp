@@ -30,7 +30,9 @@ int main(int argc, char *argv[])
 
     auto writer = volt::msg_writer();
 
-    writer.write_msg<std::int64_t>(-255);
+    std::string text = "Hello networked world!";
+
+    writer.write_msg<std::string>(text);
 
     auto &msg = writer.get_msg();
     con.send_message(msg, 0);

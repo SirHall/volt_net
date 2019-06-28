@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
 
     auto reader = volt::msg_reader(std::move(new_msg));
 
-    std::int64_t content = 0;
+    std::string content = "";
 
-    reader.read_msg_int<std::int64_t>(content);
+    reader.read_msg<std::string>(content);
 
     std::cout << "Recieved message: " << content << std::endl;
 
