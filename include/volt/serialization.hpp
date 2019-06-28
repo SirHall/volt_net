@@ -27,7 +27,9 @@ namespace volt::serialize
     void write_into_array(std::vector<T> const &v, volt::message_ptr &data,
                           bool write_size = true)
     {
-        write_into<volt::buffer_size>(v.size(), data);
+        if (write_size)
+            write_into<volt::message_array_size>(
+                (volt::message_array_size)v.size(), data);
         for (T inst : v)
             write_into<T>(inst, data);
     }
@@ -55,7 +57,7 @@ namespace volt::deserialize
 
         for (message_array_size i = 0; i < array_size; i++)
         {
-            T val;
+            T val = T();
             read_into<T>(iterator, val);
             array.push_back(val);
         }

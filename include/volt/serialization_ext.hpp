@@ -10,16 +10,18 @@
 
 namespace volt::serialize
 {
-    template <>
-    void write_into(net_word const &v, volt::message_ptr &data)
-    {
-        std::cout << "Write: " << (int)v << std::endl;
-        data->push_back(v);
-    }
+    // template <>
+    // void write_into(net_word const &v, volt::message_ptr &data)
+    // {
+    //     // std::cout << "Write: " << (int)v << std::endl;
+    //     data->push_back(v);
+    // }
 
-    // This function is declared below
+    // These functions are declared below
     template <>
     void write_into(message_array_size const &v, volt::message_ptr &data);
+    template <>
+    void write_into(net_word const &v, volt::message_ptr &data);
 
     // Writes raw bytes into the array, taking endianness into account
     void write_into_array(net_word const *begin, net_word const *end,
@@ -28,7 +30,6 @@ namespace volt::serialize
         if (write_size)
             write_into<message_array_size>((message_array_size)(end - begin),
                                            data);
-        // auto prev_size = data->size();
         data->reserve(data->size() + (end - begin));
         if (volt::net::is_be)
             for (auto it = begin; it < end; it++)
@@ -111,6 +112,26 @@ namespace volt::serialize
 #pragma region Safe Integers
 
     template <>
+    void write_into(char const &v, volt::message_ptr &data)
+    {
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(char), data,
+                         false);
+    }
+
+    template <>
+    void write_into(std::uint8_t const &v, volt::message_ptr &data)
+    {
+        data->push_back(v);
+    }
+
+    template <>
+    void write_into(std::int8_t const &v, volt::message_ptr &data)
+    {
+        write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int8_t),
+                         data, false);
+    }
+
+    template <>
     void write_into(std::uint16_t const &v, volt::message_ptr &data)
     {
         write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint16_t),
@@ -158,9 +179,10 @@ namespace volt::serialize
     void write_into(std::string const &v, volt::message_ptr &data)
     {
         // TODO: Really slow
-        auto char_vec = std::vector<char>(v.size());
-        for (size_t i = 0; i < v.size(); i++)
-            char_vec.at(i) = v.at(i);
+        auto char_vec = std::vector<char>();
+        char_vec.reserve(v.size());
+        for (char c : v)
+            char_vec.push_back(c);
         volt::serialize::write_into_array(char_vec, data, true);
     }
 
@@ -217,36 +239,6 @@ namespace volt::deserialize
         return false;
     }
 
-    template <>
-    void read_into(message_iter &iterator, net_word &instance)
-    {
-        instance = *iterator;
-        if (instance == escape_val)
-        {
-            iterator++;
-            instance = *iterator;
-        }
-        iterator++;
-    }
-
-    template <>
-    void read_into(message_iter &iterator, std::string &instance)
-    {
-        // TODO: Slow!
-
-        auto char_vec = std::vector<char>();
-        volt::deserialize::read_into_array<char>(iterator, char_vec);
-        for (char c : char_vec)
-            instance += c;
-    }
-
-    // template <>
-    // void read_into(message_iter &iterator, volt::net_word &instance)
-    // {
-    //     instance = *iterator;
-    //     iterator++;
-    // }
-
 #pragma region Safe Integers
 
     template <typename T>
@@ -258,8 +250,72 @@ namespace volt::deserialize
         iterator += sizeof(T);
     }
 
+    template <>
+    void read_into(message_iter &iterator, char &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::uint8_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::int8_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::uint16_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::int16_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::uint32_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::int32_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::uint64_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
+    template <>
+    void read_into(message_iter &iterator, std::int64_t &instance)
+    {
+        read_into_int(iterator, instance);
+    }
+
 #pragma endregion
 
+    template <>
+    void read_into(message_iter &iterator, std::string &instance)
+    {
+        // TODO: Slow!
+
+        auto char_vec = std::vector<char>();
+        volt::deserialize::read_into_array<char>(iterator, char_vec);
+        for (char c : char_vec)
+            instance += c;
+    }
 } // namespace volt::deserialize
 
 #endif
