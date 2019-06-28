@@ -3,7 +3,7 @@
 #include "volt/connection.hpp"
 #include "volt/listen/listener.hpp"
 #include "volt/message.hpp"
-#include "volt/serialization.hpp"
+#include "volt/messages/msg_writer.hpp"
 #include "volt/serialization_ext.hpp"
 
 #include <chrono>
@@ -28,11 +28,12 @@ int main(int argc, char *argv[])
     con.add_protocol(std::make_unique<volt::protocol::tcp_protocol>(
         (sockaddr *)&addr, sizeof(addr), socket_fd));
 
-    auto m = volt::message();
+    auto writer = volt::msg_writer();
 
-    m.write<std::string>("Hello world");
+    writer.write_msg<std::int64_t>(-255);
 
-    con.send_message(m, 0);
+    auto &msg = writer.get_msg();
+    con.send_message(msg, 0);
 
     std::cout << "Sent message" << std::endl;
 
