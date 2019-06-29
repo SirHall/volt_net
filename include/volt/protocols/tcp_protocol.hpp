@@ -91,9 +91,9 @@ namespace volt::protocol
             return (poll_fd.revents & (POLLWRBAND | POLLOUT)) > 0;
         }
 
-        volt::message_ptr recieve_msg()
+        void recieve_msg(volt::message_ptr &msg)
         {
-            volt::message_ptr msg = volt::message_ptr(new volt::message());
+            msg->resize(0);
 
             // current_size == msg_len must be true
             volt::buffer_size current_size = 0;
@@ -114,7 +114,6 @@ namespace volt::protocol
                 }
                 msg->push_back(b);
             }
-            return msg;
         }
     };
 } // namespace volt::protocol

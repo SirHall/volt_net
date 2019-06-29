@@ -25,7 +25,7 @@ namespace volt::protocol
 
         virtual void send_msg(volt::message_ptr const &m) = 0;
 
-        virtual volt::message_ptr recieve_msg() = 0;
+        virtual void recieve_msg(volt::message_ptr &msg) = 0;
     };
 } // namespace volt::protocol
 
