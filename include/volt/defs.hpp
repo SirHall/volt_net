@@ -35,6 +35,28 @@ namespace volt
     }
 
     typedef std::uint8_t prot_identifier;
+
+    // Connection ID's
+    typedef std::uint_fast32_t con_id;
+
+    class msg_reader;
+    class msg_writer;
+
+    typedef std::unique_ptr<msg_reader> reader_ptr;
+    typedef std::unique_ptr<msg_writer> writer_ptr;
+
+    reader_ptr make_reader() { return std::make_unique<msg_reader>(); }
+    reader_ptr make_reader(message_ptr msg)
+    {
+        return std::make_unique<msg_reader>(std::move(msg));
+    }
+
+    writer_ptr make_writer() { return std::make_unique<msg_writer>(); }
+    writer_ptr make_writer(message_ptr msg)
+    {
+        return std::make_unique<msg_writer>(std::move(msg));
+    }
+
 } // namespace volt
 
 #endif
