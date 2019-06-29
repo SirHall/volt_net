@@ -5,6 +5,8 @@
 #include <poll.h>
 
 #include "volt/defs.hpp"
+#include "volt/messages/msg_reader.hpp"
+#include "volt/messages/msg_writer.hpp"
 #include "volt/protocols/protocol.hpp"
 #include <map>
 #include <memory>
@@ -68,9 +70,28 @@ namespace volt
             protocols[prot_id]->send_msg(m);
         }
 
-        volt::message_ptr recieve_messages(volt::prot_identifier prot_id)
+        void send_message(volt::msg_writer &    writer,
+                          volt::prot_identifier prot_id)
         {
-            return std::move(protocols[prot_id]->recieve_msg());
+            protocols[prot_id]->send_msg(writer.get_msg());
+        }
+
+        void recieve_message(volt::message_ptr     msg,
+                             volt::prot_identifier prot_id)
+        {
+            protocols[prot_id]->recieve_msg(msg);
+        }
+
+        volt::message_ptr recieve_message(volt::prot_identifier prot_id)
+        {
+            volt::message_ptr msg = std::move(msg_pool::get_message());
+            protocols[prot_id]->recieve_msg(msg);
+            return std::move(msg);
+        }
+
+        volt::reader_ptr recieve_reader(volt::prot_identifier prot_id)
+        {
+            return volt::make_reader(std::move(recieve_message(prot_id)));
         }
     };
 } // namespace volt
