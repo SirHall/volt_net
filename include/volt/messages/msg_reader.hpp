@@ -4,6 +4,7 @@
 
 #include "volt/defs.hpp"
 #include "volt/message.hpp"
+#include "volt/messages/msg_pool.hpp"
 #include "volt/serialization.hpp"
 #include <memory>
 
@@ -21,10 +22,14 @@ namespace volt
             msg  = std::move(message);
             iter = msg->begin();
         }
-        ~msg_reader()
+
+        msg_reader()
         {
-            // Give message back to central queue
+            msg  = std::move(volt::msg_pool::get_message());
+            iter = msg->begin();
         }
+
+        ~msg_reader() { volt::msg_pool::return_message(std::move(msg)); }
 
         template <typename T>
         void read_msg(T &instance)
