@@ -25,7 +25,7 @@ namespace volt
                 {
                     std::lock_guard guard(_mut);
                     msg = std::move(msg_vec.back());
-                    msg_vec.pop_back;
+                    msg_vec.pop_back();
                 }
 
                 return std::move(msg);
