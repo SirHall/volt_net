@@ -10,6 +10,7 @@ CTestTestfile.cmake
 build/
 bin/
 *.o
+err_file
 
 .clang_complete
 
