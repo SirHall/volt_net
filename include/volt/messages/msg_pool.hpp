@@ -9,7 +9,7 @@
 #include <vector>
 
 static std::vector<volt::message_ptr> msg_vec;
-static std::mutex                     _mut;
+static std::mutex                     mut;
 static constexpr unsigned int         max_messages = 50;
 
 namespace volt::msg_pool
@@ -18,7 +18,7 @@ namespace volt::msg_pool
     volt::message_ptr get_message()
     {
         {
-            std::lock_guard guard(_mut);
+            std::lock_guard guard(mut);
             if (msg_vec.size() > 0)
             {
                 volt::message_ptr msg = std::move(msg_vec.back());
@@ -31,7 +31,7 @@ namespace volt::msg_pool
 
     void return_message(volt::message_ptr msg)
     {
-        std::lock_guard guard(_mut);
+        std::lock_guard guard(mut);
         if (msg_vec.size() >= max_messages)
             msg_vec.push_back(std::move(msg));
         // Otherwise, just destroy the message
