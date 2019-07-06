@@ -29,6 +29,8 @@ namespace volt::event
 
         T &get() { return glob_inst; }
 
+        T *operator->() { return &glob_inst; }
+
         static void subscribe(std::function<void(T &)> *obs)
         {
             subscribers.push_back(obs);
