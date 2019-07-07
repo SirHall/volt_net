@@ -12,31 +12,36 @@ namespace volt::event
     class global_event
     {
       protected:
-        static inline std::vector<std::function<void(T &)> *> subscribers;
-        static inline T                                       glob_inst;
+        static inline std::vector<std::function<void(T const &)> *> subscribers;
+        // static inline T glob_inst;
 
-        void call_subscribers()
+      public:
+        global_event() = delete;
+
+        ~global_event() = delete;
+
+        // void set(T inst)
+        // {
+        //     ~glob_inst;
+        //     glob_inst = std::move(inst);
+        // }
+
+        // T &get() { return glob_inst; }
+
+        // T *operator->() { return &glob_inst; }
+
+        static void call_event(T const &inst)
         {
-            // Fire event on object destruction
             for (auto subscriber : subscribers)
                 (*subscriber)(glob_inst);
         }
 
-      public:
-        global_event() {}
-
-        ~global_event() { call_subscribers(); }
-
-        T &get() { return glob_inst; }
-
-        T *operator->() { return &glob_inst; }
-
-        static void subscribe(std::function<void(T &)> *obs)
+        static void subscribe(std::function<void(T const &)> *obs)
         {
             subscribers.push_back(obs);
         }
 
-        static void unsubscribe(std::function<void(T &)> *obs)
+        static void unsubscribe(std::function<void(T const &)> *obs)
         {
             bool in_place = true; // TODO: Move this
             if (in_place)

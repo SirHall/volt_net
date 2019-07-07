@@ -14,12 +14,12 @@ namespace volt::event
         friend class global_event<T>;
 
       private:
-        std::function<void(T &)> event;
+        std::function<void(T const &)> event;
         // void                     call_event(T &obj_ref) { event(obj_ref); }
 
       public:
         observer(observer &other) = delete; // No copying allowed
-        observer(std::function<void(T &)> action)
+        observer(std::function<void(T const &)> action)
         {
             // Subscribe to global_event
             event = action;
