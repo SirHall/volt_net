@@ -2,10 +2,10 @@
 #ifndef msg_reader_hpp
 #define msg_reader_hpp
 
-#include "volt/defs.hpp"
-#include "volt/message.hpp"
 #include "volt/messages/msg_pool.hpp"
-#include "volt/serialization.hpp"
+#include "volt/serialization/net_serialize.hpp"
+#include "volt/serialization/serialization_ext.hpp"
+#include "volt/volt_defs.hpp"
 #include <memory>
 
 namespace volt
@@ -17,19 +17,11 @@ namespace volt
         volt::message_iter iter;
 
       public:
-        msg_reader(volt::message_ptr message)
-        {
-            msg  = std::move(message);
-            iter = msg->begin();
-        }
+        msg_reader(volt::message_ptr message);
 
-        msg_reader()
-        {
-            msg  = std::move(volt::msg_pool::get_message());
-            iter = msg->begin();
-        }
+        msg_reader();
 
-        ~msg_reader() { volt::msg_pool::return_message(std::move(msg)); }
+        ~msg_reader();
 
         template <typename T>
         void read_msg(T &instance)
@@ -43,6 +35,12 @@ namespace volt
             volt::deserialize::read_into_int<T>(iter, instance);
         }
     };
+
+    typedef std::unique_ptr<msg_reader> reader_ptr;
+
+    reader_ptr make_reader();
+
+    reader_ptr make_reader(message_ptr msg);
 } // namespace volt
 
 #endif
