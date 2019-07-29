@@ -1,9 +1,9 @@
 #pragma once
-#ifndef serialization_hpp
-#define serialization_hpp
+#ifndef net_serialize_hpp
+#define net_serialize_hpp
 
-#include "volt/defs.hpp"
-#include "volt/endian.hpp"
+#include "volt/volt_defs.hpp"
+#include "volt/volt_endian.hpp"
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
