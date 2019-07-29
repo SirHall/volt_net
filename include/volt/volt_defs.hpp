@@ -1,10 +1,12 @@
 #pragma once
-#ifndef defs_hpp
-#define defs_hpp
+#ifndef volt_defs_hpp
+#define volt_defs_hpp
 
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+#define _XOPEN_SOURCE_EXTENDED 1
 
 // This must be identical across the entire program, servers and clients
 namespace volt
@@ -29,34 +31,14 @@ namespace volt
     typedef std::unique_ptr<std::vector<net_word>> message_ptr;
 
     // Returns a new instance of a message pointer
-    message_ptr make_message()
-    {
-        return std::make_unique<std::vector<net_word>>();
-    }
+    message_ptr make_message();
 
     typedef std::uint8_t prot_identifier;
 
     // Connection ID's
-    typedef std::uint_fast32_t con_id;
+    typedef std::uint16_t con_id;
 
-    class msg_reader;
-    class msg_writer;
-
-    typedef std::unique_ptr<msg_reader> reader_ptr;
-    typedef std::unique_ptr<msg_writer> writer_ptr;
-
-    reader_ptr make_reader() { return std::make_unique<msg_reader>(); }
-    reader_ptr make_reader(message_ptr msg)
-    {
-        return std::make_unique<msg_reader>(std::move(msg));
-    }
-
-    writer_ptr make_writer() { return std::make_unique<msg_writer>(); }
-    writer_ptr make_writer(message_ptr msg)
-    {
-        return std::make_unique<msg_writer>(std::move(msg));
-    }
-
+    constexpr std::uint16_t default_port = 64426;
 } // namespace volt
 
 #endif
