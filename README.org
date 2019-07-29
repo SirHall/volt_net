@@ -1,0 +1,9 @@
+* VoltNet
+  VoltNet is meant to be a lightweight TCP networking library that thinly
+  wraps around UNIX TCP sockets.
+
+  This library is very early in development and therefore isn't industry
+  ready. 
+
+  It aims to provide a message-based wrapper to the stream-based connection
+  used by TCP.
