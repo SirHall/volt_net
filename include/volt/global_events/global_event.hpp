@@ -5,6 +5,7 @@
 // #include "volt/global_events/observer.hpp"
 #include <algorithm>
 #include <functional>
+#include <iostream>
 
 namespace volt::event
 {
@@ -13,49 +14,46 @@ namespace volt::event
     {
       protected:
         static inline std::vector<std::function<void(T const &)> *> subscribers;
-        // static inline T glob_inst;
 
       public:
-        global_event() = delete;
-
+        global_event()  = delete;
         ~global_event() = delete;
-
-        // void set(T inst)
-        // {
-        //     ~glob_inst;
-        //     glob_inst = std::move(inst);
-        // }
-
-        // T &get() { return glob_inst; }
-
-        // T *operator->() { return &glob_inst; }
 
         static void call_event(T const &inst)
         {
             for (auto subscriber : subscribers)
-                (*subscriber)(glob_inst);
+                (*subscriber)(inst);
         }
 
         static void subscribe(std::function<void(T const &)> *obs)
         {
+            std::cout << "Subscribed" << std::endl;
             subscribers.push_back(obs);
+            std::cout << subscribers.size() << std::endl;
         }
 
         static void unsubscribe(std::function<void(T const &)> *obs)
         {
+            std::cout << "Unsubbing" << std::endl;
+            std::cout << subscribers.size() << std::endl;
             bool in_place = true; // TODO: Move this
-            if (in_place)
+            auto it = std::find(subscribers.begin(), subscribers.end(), obs);
+            if (it != subscribers.end())
             {
-                subscribers.erase(
-                    std::find(subscribers.begin(), subscribers.end(), obs));
+                if (in_place)
+                {
+                    subscribers.erase(it);
+                }
+                else
+                {
+                    // Swap with last element and remove
+                    std::iter_swap(it, subscribers.end());
+                    subscribers.pop_back();
+                }
             }
             else
             {
-                // Swap with last element and remove
-                std::iter_swap(
-                    std::find(subscribers.begin(), subscribers.end(), obs),
-                    subscribers.end());
-                subscribers.pop_back();
+                std::cout << "\t\tNothing deleted" << std::endl;
             }
         }
     };

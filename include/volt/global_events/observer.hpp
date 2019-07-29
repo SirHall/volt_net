@@ -11,14 +11,11 @@ namespace volt::event
     template <typename T>
     class observer
     {
-        friend class global_event<T>;
-
       private:
         std::function<void(T const &)> event;
-        // void                     call_event(T &obj_ref) { event(obj_ref); }
 
       public:
-        observer(observer &other) = delete; // No copying allowed
+        observer(observer const &other) = delete; // No copying allowed
         observer(std::function<void(T const &)> action)
         {
             // Subscribe to global_event
@@ -27,8 +24,10 @@ namespace volt::event
         }
         ~observer()
         {
+            std::cout << "Before del" << std::endl;
             // Unsubscribe from global_event
             global_event<T>::unsubscribe(&event);
+            std::cout << "After del" << std::endl;
         }
     };
 } // namespace volt::event
