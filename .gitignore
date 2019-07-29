@@ -12,7 +12,5 @@ bin/
 *.o
 err_file
 
-.clang_complete
-
 .vscode/
 out
