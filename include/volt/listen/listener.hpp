@@ -26,7 +26,7 @@ namespace volt
         std::atomic_bool          listener_open;
 
         struct pollfd fds[1];
-        int timeout = 0;
+        int timeout = 1000;
 
         void loop();
 
