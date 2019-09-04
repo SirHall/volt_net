@@ -43,9 +43,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Server launched" << std::endl;
     {
-        auto net_listener =
-            volt::listener({64420, 64421, 64422, 64423, 64424, 64425, 64426,
-                            64427, 64428, 64429, 64430});
+        auto net_listener = volt::listener(64420);
 
         while (!quit)
         {

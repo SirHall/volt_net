@@ -21,14 +21,18 @@ void handle_close(int s)
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        std::cerr << "Use format is 'client [target ip] [target port]'"
+                  << std::endl;
+        return -1;
+    }
 
-    signal(SIGINT, handle_close);     // User pressed Ctrl + C
+    signal(SIGINT, handle_close); // User pressed Ctrl + C
 
     std::cout << "Connecting to server..." << std::endl;
     // int con_stat = volt::net_con::server_connect(socket_fd, addr);
-    int con_stat =
-        volt::net_con::server_connect({64420, 64421, 64422, 64423, 64424, 64425,
-                                       64426, 64427, 64428, 64429, 64430});
+    int con_stat = volt::net_con::server_connect(argv[1], argv[2]);
     std::cout << "Connection Status: " << con_stat << std::endl;
 
     std::string line = "";
