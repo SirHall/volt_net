@@ -30,10 +30,10 @@ namespace volt
 
         void loop();
 
-        int open_socket(std::vector<std::uint16_t> ports);
+        int open_socket();
 
       public:
-        listener(std::vector<std::uint16_t> ports);
+        listener(std::uint16_t hostport);
 
         ~listener();
 

@@ -8,7 +8,7 @@ void volt::listener::loop()
     }
 }
 
-int volt::listener::open_socket(std::vector<std::uint16_t> ports)
+int volt::listener::open_socket()
 {
     // Get the socket file descriptor for the new socket
     socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -27,21 +27,9 @@ int volt::listener::open_socket(std::vector<std::uint16_t> ports)
     ((sockaddr_in *)addr.get())->sin_family      = AF_INET; // TCP
     ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
     // This is modified again below
-    ((sockaddr_in *)addr.get())->sin_port = htons(0);
+    ((sockaddr_in *)addr.get())->sin_port = htons(port);
 
-    int b_res = -1; // Assume an error
-
-    // Try every port until a good one is found
-    for (uint16_t try_port : ports)
-    {
-        ((sockaddr_in *)addr.get())->sin_port = htons(try_port);
-        b_res = bind(socket_fd, (sockaddr *)addr.get(), sizeof(sockaddr_in));
-        if (b_res >= 0)
-        {
-            this->port = try_port;
-            break;
-        }
-    }
+    int b_res = bind(socket_fd, (sockaddr *)addr.get(), sizeof(sockaddr_in));
 
     // Bind this file descriptor to a port
     if (b_res < 0)
@@ -63,9 +51,10 @@ int volt::listener::open_socket(std::vector<std::uint16_t> ports)
     return 0;
 }
 
-volt::listener::listener(std::vector<std::uint16_t> ports)
+volt::listener::listener(std::uint16_t hostport)
 {
-    if (open_socket(ports) == 0)
+    this->port = hostport;
+    if (open_socket() == 0)
     {
         fds->fd     = socket_fd;
         fds->events = 0; // Just for that extra layer of safety
@@ -120,8 +109,7 @@ void volt::listener::accept_new_connection()
         else
         {
             auto lock = volt::net_con::aquire_lock();
-            volt::net_con::new_connection(std::move(new_addr), len, con_fd,
-                                          lock);
+            volt::net_con::new_connection(con_fd, lock);
         }
     }
 }
