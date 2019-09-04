@@ -9,7 +9,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <execinfo.h>
 #include <signal.h>
 #include <string>
 #include <thread>
@@ -29,21 +28,6 @@ void handle_close(int s)
     quit = true;
 }
 
-// Borrowed kindly from https://stackoverflow.com/a/77336
-void handle_segfault(int sig)
-{
-    void * array[10];
-    size_t size;
-
-    // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
-
-    // print out all the frames to stderr
-    fprintf(stderr, "Error: signal %d:\n", sig);
-    backtrace_symbols_fd(array, size, STDERR_FILENO);
-    exit(1);
-}
-
 void msg_event(volt::reader_ptr const &reader)
 {
     std::string str = "";
@@ -53,20 +37,22 @@ void msg_event(volt::reader_ptr const &reader)
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, handle_close);     // User pressed Ctrl + C
-    signal(SIGSEGV, handle_segfault); // Segmentation fault
+    signal(SIGINT, handle_close); // User pressed Ctrl + C
 
     auto obs = volt::event::observer<volt::reader_ptr>(msg_event);
 
     std::cout << "Server launched" << std::endl;
-
-    auto net_listener = volt::listener();
-
-    while (!quit)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        volt::net::notify_listeners();
-    }
+        auto net_listener =
+            volt::listener({64420, 64421, 64422, 64423, 64424, 64425, 64426,
+                            64427, 64428, 64429, 64430});
 
+        while (!quit)
+        {
+            // std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            volt::net::notify_listeners();
+        }
+    }
     return 0;
 }
