@@ -1,5 +1,6 @@
 #include "volt/net_con.hpp"
 // #include "volt/con_pool.hpp"
+#include "volt/addr_resolver.hpp"
 #include "volt/event_types/e_closed_con.hpp"
 #include "volt/event_types/e_new_con.hpp"
 #include "volt/global_events/global_event.hpp"
@@ -8,6 +9,7 @@
 #include <assert.h>
 #include <iostream>
 #include <poll.h>
+#include <string>
 
 static std::unordered_map<volt::con_id, volt::connection_ptr> cons_map;
 
@@ -18,15 +20,13 @@ static std::unique_ptr<volt::net_con> null_con =
 
 #pragma region Global Functions
 
-volt::con_id volt::net_con::new_connection(std::unique_ptr<sockaddr> socket,
-                                           socklen_t                 length,
-                                           int           con_file_descriptor,
+volt::con_id volt::net_con::new_connection(int           con_file_descriptor,
                                            aquired_lock &lock)
 {
     // auto new_con = std::make_unique<net_con>(std::move(socket), length,
     // con_file_descriptor);
-    auto new_con = std::unique_ptr<volt::net_con>(
-        new net_con(std::move(socket), length, con_file_descriptor));
+    auto new_con =
+        std::unique_ptr<volt::net_con>(new net_con(con_file_descriptor));
     volt::con_id new_id = new_con->get_con_id();
     cons_map.insert(std::pair(new_con->get_con_id(), std::move(new_con)));
     return new_id;
@@ -157,9 +157,7 @@ volt::net_word volt::net_con::get_next_byte()
 //     return alloc_mem;
 // }
 
-volt::net_con::net_con(std::unique_ptr<sockaddr> socket, socklen_t length,
-                       int con_file_descriptor)
-    : addr(std::move(socket)), len(length), con_fd(con_file_descriptor)
+volt::net_con::net_con(int con_file_descriptor) : con_fd(con_file_descriptor)
 {
     con_open = true;
     assign_next_id();
@@ -192,46 +190,55 @@ volt::net_con::~net_con()
 }
 
 // Currently only supports IPv4
-int volt::net_con::server_connect(std::vector<std::uint16_t> ports)
+int volt::net_con::server_connect(std::string const address,
+                                  std::string const port)
 {
-    int  socket_fd;
-    auto addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
+    // int  socket_fd;
+    // auto addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
     // uint16_t    port = volt::default_port;
-    std::size_t len = sizeof(sockaddr_in);
-    memset(addr.get(), 0, len);
+    // std::size_t len = sizeof(sockaddr_in);
+    // memset(addr.get(), 0, len);
 
     // Get the socket file descriptor for the new socket
-    socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
     // Addr settings
-    ((sockaddr_in *)addr.get())->sin_family      = AF_INET;  // TCP
-    ((sockaddr_in *)addr.get())->sin_port        = htons(0); // Changed below
-    ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
+    // ((sockaddr_in *)addr.get())->sin_family      = AF_INET; // TCP
+    // ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
+    // uint16_t port_int = 0;
+    // try
+    // {
+    //     port_int = std::stoi(port, nullptr, 10);
+    // }
+    // catch (const std::invalid_argument &ia)
+    // {
+    //     std::cerr << "Invalid argument for port: " << ia.what() << '\n';
+    //     return -1;
+    // }
+    // ((sockaddr_in *)addr.get())->sin_port = htons(port_int);
 
-    int con_result = -1; // Assume an error
-    // uint16_t correct_port = 0;
+    // std::cout << "Attempting connection on socket: " << socket_fd
+    //           << " port: " << port_int << std::endl;
 
-    for (uint16_t port : ports)
+    auto addrs_found = volt::net::resolve_address(address, port);
+
+    // Attempt to connect to each address structure found
+    for (auto rp = addrs_found.get(); rp != nullptr; rp = rp->ai_next)
     {
-        std::cout << "Attempting connection on socket: " << socket_fd
-                  << " port: " << port << std::endl;
-        ((sockaddr_in *)addr.get())->sin_port = htons(port);
-        con_result = connect(socket_fd, addr.get(), len);
-        if (con_result == 0)
+        int socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if (socket_fd < 0)
+            continue;
+        int con_result = connect(socket_fd, rp->ai_addr, rp->ai_addrlen);
+        if (con_result >= 0)
         {
-            // correct_port = port;
-            break;
+            {
+                auto lock = volt::net_con::aquire_lock();
+                volt::net_con::new_connection(socket_fd, lock);
+            }
+            return con_result; // We found a working address
         }
+        close(socket_fd); // Close the old socket
     }
 
-    if (con_result == 0)
-    {
-        // TODO Store this net_con in a map
-        auto lock = volt::net_con::aquire_lock();
-        volt::net_con::new_connection(std::move(addr), len, socket_fd, lock);
-    }
-
-    return con_result;
+    return -1; // We could not connect
 }
 
 void volt::net_con::close_self()

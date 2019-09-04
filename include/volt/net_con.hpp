@@ -43,9 +43,9 @@ namespace volt
 
 #pragma region Addressing
 
-        const std::unique_ptr<sockaddr> addr;
-        const socklen_t                 len;
-        const int                       con_fd;
+        // const std::unique_ptr<sockaddr> addr;
+        // const socklen_t                 len;
+        const int con_fd;
 
 #pragma endregion
 
@@ -98,8 +98,7 @@ namespace volt
 
       private:
         // Creates a new net_congiven the TCP file descriptor
-        net_con(std::unique_ptr<sockaddr> socket, socklen_t length,
-                int con_file_descriptor);
+        net_con(int con_file_descriptor);
 
         void close_self();
 
@@ -111,7 +110,8 @@ namespace volt
         volt::con_id get_con_id() const { return id; }
 
         // Attempts to connect to a listening server, returns state
-        static int server_connect(std::vector<std::uint16_t> ports);
+        static int server_connect(std::string const address,
+                                  std::string const port);
 
 #pragma region Message Transmission
 
@@ -121,9 +121,7 @@ namespace volt
 
 #pragma region GLobal Functions
 
-        static volt::con_id new_connection(std::unique_ptr<sockaddr> socket,
-                                           socklen_t                 length,
-                                           int           con_file_descriptor,
+        static volt::con_id new_connection(int           con_file_descriptor,
                                            aquired_lock &lock);
 
         static bool con_exists(con_id id, aquired_lock &lock);
