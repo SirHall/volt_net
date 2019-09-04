@@ -5,28 +5,28 @@
 #include "volt/global_events/global_event.hpp"
 #include "volt/volt_defs.hpp"
 
+#include <assert.h>
 #include <iostream>
 #include <poll.h>
-#include <assert.h>
 
 static std::unordered_map<volt::con_id, volt::connection_ptr> cons_map;
 
 static std::recursive_mutex cons_map_mut;
 
+static std::unique_ptr<volt::net_con> null_con =
+    std::unique_ptr<volt::net_con>(nullptr);
 
 #pragma region Global Functions
 
-volt::con_id volt::net_con::new_connection(std::unique_ptr<sockaddr> socket, socklen_t length,
-            int con_file_descriptor, aquired_lock &lock)
+volt::con_id volt::net_con::new_connection(std::unique_ptr<sockaddr> socket,
+                                           socklen_t                 length,
+                                           int           con_file_descriptor,
+                                           aquired_lock &lock)
 {
-    // auto new_con = std::make_unique<net_con>(std::move(socket), length, con_file_descriptor);
+    // auto new_con = std::make_unique<net_con>(std::move(socket), length,
+    // con_file_descriptor);
     auto new_con = std::unique_ptr<volt::net_con>(
-        new net_con(
-            std::move(socket),
-            length,
-            con_file_descriptor
-        )
-    );
+        new net_con(std::move(socket), length, con_file_descriptor));
     volt::con_id new_id = new_con->get_con_id();
     cons_map.insert(std::pair(new_con->get_con_id(), std::move(new_con)));
     return new_id;
@@ -37,22 +37,28 @@ bool volt::net_con::con_exists(con_id id, aquired_lock &lock)
     return cons_map.find(id) != cons_map.end();
 }
 
-void volt::net_con::send_msg_to(volt::con_id id, volt::message_ptr &msg, aquired_lock &lock)
+bool volt::net_con::send_msg_to(volt::con_id id, volt::message_ptr &msg,
+                                aquired_lock &lock)
 {
     // std::lock_guard lock(cons_map_mut);
-    cons_map[id]->send_msg(msg);
+    return cons_map[id]->send_msg(msg);
 }
 
-std::size_t volt::net_con::con_count(aquired_lock &lock) { return cons_map.size(); }
+std::size_t volt::net_con::con_count(aquired_lock &lock)
+{
+    return cons_map.size();
+}
 
 volt::aquired_lock volt::net_con::aquire_lock()
 {
-    return std::make_unique<std::lock_guard<std::recursive_mutex>>(cons_map_mut);
+    return std::make_unique<std::lock_guard<std::recursive_mutex>>(
+        cons_map_mut);
 }
 
-std::vector<volt::con_id> volt::net_con::get_con_ids(aquired_lock &lock){
+std::vector<volt::con_id> volt::net_con::get_con_ids(aquired_lock &lock)
+{
     auto ids = std::vector<volt::con_id>();
-    for(auto i = cons_map.begin(); i != cons_map.end(); i++)
+    for (auto i = cons_map.begin(); i != cons_map.end(); i++)
         ids.push_back(i->first);
     return ids;
 }
@@ -60,15 +66,22 @@ std::vector<volt::con_id> volt::net_con::get_con_ids(aquired_lock &lock){
 void volt::net_con::close_con(volt::con_id id, volt::aquired_lock &lock)
 {
     auto loc_iter = cons_map.find(id);
-    if(loc_iter != cons_map.end()) //This connection id exists
+    if (loc_iter != cons_map.end()) // This connection id exists
         cons_map.erase(loc_iter);
 }
 
-volt::connection_ptr & volt::net_con::get_con(volt::con_id id, volt::aquired_lock &lock)
+volt::connection_ptr &volt::net_con::get_con(volt::con_id        id,
+                                             volt::aquired_lock &lock)
 {
     auto loc_iter = cons_map.find(id);
-    assert(loc_iter != cons_map.end());
-    return loc_iter->second;
+    if (loc_iter != cons_map.end())
+    { // This is a valid connection
+        return loc_iter->second;
+    }
+    else
+    { // Invalid connection, it does not exist
+        return null_con;
+    }
 }
 
 static volt::con_id next_id = 0;
@@ -83,24 +96,24 @@ void volt::net_con::recieve_next_buf()
 {
     // std::cout << "Recieving next buffer" << std::endl;
 
-    while(true)
+    while (true)
     {
-        if(!con_open)
+        if (!con_open)
             return;
 
         auto poll_res = poll(fds, 1, timeout);
-        if(poll_res == -1)
+        if (poll_res == -1)
         {
             std::cerr << "Error occured while polling " << std::endl;
             close_self();
             // volt::con_pool::con_delete(this->get_con_id());
             return;
-        }else if(poll_res > 0)
+        }
+        else if (poll_res > 0)
         {
             // std::cout << "Poll found recieved data" << std::endl;
             break;
         }
-
     }
 
     auto len = recv(con_fd, buff.data(), volt::max_buffer_size, 0);
@@ -125,10 +138,10 @@ volt::net_word volt::net_con::get_next_byte()
 {
     while ((msg_size == 0) || (current_index >= msg_size))
     {
-        if(con_open)
+        if (con_open)
             recieve_next_buf();
         else
-            return 0; //Not really anything good to put here
+            return 0; // Not really anything good to put here
     }
     auto val = buff.at(current_index);
     current_index++;
@@ -154,11 +167,11 @@ volt::net_con::net_con(std::unique_ptr<sockaddr> socket, socklen_t length,
     send_buff.resize(volt::max_buffer_size);
     current_index = 0;
 
-    fds->fd = con_file_descriptor;
-    fds->events = 0; //Just for that extra layer of safety
+    fds->fd     = con_file_descriptor;
+    fds->events = 0; // Just for that extra layer of safety
     fds->events = POLLIN;
 
-    auto thr           = std::thread([=]() { this->loop(); });
+    auto thr = std::thread([=]() { this->loop(); });
     thr.detach();
     using namespace volt::event;
     global_event<e_new_con>::call_event(e_new_con(this->get_con_id()));
@@ -179,24 +192,37 @@ volt::net_con::~net_con()
 }
 
 // Currently only supports IPv4
-int volt::net_con::server_connect()
+int volt::net_con::server_connect(std::vector<std::uint16_t> ports)
 {
-    int         socket_fd;
-    auto        addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
-    uint16_t    port = volt::default_port;
-    std::size_t len  = sizeof(sockaddr_in);
+    int  socket_fd;
+    auto addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
+    // uint16_t    port = volt::default_port;
+    std::size_t len = sizeof(sockaddr_in);
     memset(addr.get(), 0, len);
 
     // Get the socket file descriptor for the new socket
     socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     // Addr settings
-    ((sockaddr_in *)addr.get())->sin_family      = AF_INET; // TCP
-    ((sockaddr_in *)addr.get())->sin_port        = htons(port);
+    ((sockaddr_in *)addr.get())->sin_family      = AF_INET;  // TCP
+    ((sockaddr_in *)addr.get())->sin_port        = htons(0); // Changed below
     ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
 
-    std::cout << "Attempting connection on socket " << socket_fd << std::endl;
-    int con_result = connect(socket_fd, addr.get(), len);
+    int con_result = -1; // Assume an error
+    // uint16_t correct_port = 0;
+
+    for (uint16_t port : ports)
+    {
+        std::cout << "Attempting connection on socket: " << socket_fd
+                  << " port: " << port << std::endl;
+        ((sockaddr_in *)addr.get())->sin_port = htons(port);
+        con_result = connect(socket_fd, addr.get(), len);
+        if (con_result == 0)
+        {
+            // correct_port = port;
+            break;
+        }
+    }
 
     if (con_result == 0)
     {
@@ -210,7 +236,7 @@ int volt::net_con::server_connect()
 
 void volt::net_con::close_self()
 {
-    con_open = false;
+    con_open  = false;
     auto lock = volt::net_con::aquire_lock();
     volt::net_con::close_con(this->get_con_id(), lock);
 }
@@ -246,12 +272,12 @@ void volt::net_con::recieve_msg()
         msg->push_back(b);
     }
 
-    // TODO Not exactly very thread-safe 
-    if(con_open)
+    // TODO Not exactly very thread-safe
+    if (con_open)
         volt::net::submit::submit_message(std::move(msg));
 }
 
-void volt::net_con::send_msg(volt::message_ptr const &m)
+bool volt::net_con::send_msg(volt::message_ptr const &m)
 {
     // We could have messages coming in from many different threads
     std::lock_guard _send_buff_lock(_send_buff_mut);
@@ -271,7 +297,8 @@ void volt::net_con::send_msg(volt::message_ptr const &m)
     // for (std::size_t i = 0; i < send_buff.size(); i++)
     //     std::cout << " " << (unsigned int)send_buff.at(i);
     // std::cout << std::endl;
-    send(con_fd, send_buff.data(), send_buff.size(), 0);
+
+    return send(con_fd, send_buff.data(), send_buff.size(), 0) > 0;
 }
 
 #pragma endregion

@@ -18,13 +18,12 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <thread>
 #include <unistd.h>
 #include <vector>
-#include <poll.h>
-#include <mutex>
 
 namespace volt
 {
@@ -72,14 +71,12 @@ namespace volt
 
         volt::net_word get_next_byte();
 
-        // volt::net_word *get_next_bytes(std::size_t count);
-
 #pragma endregion
 
 #pragma region Polling
 
-struct pollfd fds[1];
-int timeout = 0;
+        struct pollfd fds[1];
+        int           timeout = 250;
 
 #pragma endregion
 
@@ -103,11 +100,10 @@ int timeout = 0;
         // Creates a new net_congiven the TCP file descriptor
         net_con(std::unique_ptr<sockaddr> socket, socklen_t length,
                 int con_file_descriptor);
-        
+
         void close_self();
 
       public:
-
         // No copying is allowed
         net_con(net_con const &other) = delete;
         ~net_con();
@@ -115,25 +111,25 @@ int timeout = 0;
         volt::con_id get_con_id() const { return id; }
 
         // Attempts to connect to a listening server, returns state
-        static int server_connect();
-
+        static int server_connect(std::vector<std::uint16_t> ports);
 
 #pragma region Message Transmission
 
-        void send_msg(volt::message_ptr const &m);
+        bool send_msg(volt::message_ptr const &m);
 
 #pragma endregion
 
-
 #pragma region GLobal Functions
 
-        static volt::con_id new_connection(
-            std::unique_ptr<sockaddr> socket, socklen_t length,
-            int con_file_descriptor,  aquired_lock &lock);
+        static volt::con_id new_connection(std::unique_ptr<sockaddr> socket,
+                                           socklen_t                 length,
+                                           int           con_file_descriptor,
+                                           aquired_lock &lock);
 
         static bool con_exists(con_id id, aquired_lock &lock);
 
-        static void send_msg_to(volt::con_id id, volt::message_ptr &msg, aquired_lock &lock);
+        static bool send_msg_to(volt::con_id id, volt::message_ptr &msg,
+                                aquired_lock &lock);
 
         static std::size_t con_count(aquired_lock &lock);
 
@@ -143,10 +139,9 @@ int timeout = 0;
 
         static void close_con(con_id id, aquired_lock &lock);
 
-        static connection_ptr & get_con(con_id id, aquired_lock &lock);
+        static connection_ptr &get_con(con_id id, aquired_lock &lock);
 
 #pragma endregion
-
     };
 } // namespace volt
 
