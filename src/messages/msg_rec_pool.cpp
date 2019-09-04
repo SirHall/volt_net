@@ -2,7 +2,7 @@
 
 static std::queue<volt::message_ptr> rec_msg_vec;
 static std::mutex                    mut;
-static constexpr bool                defer_msg_signal = true;
+static constexpr bool                defer_msg_signal = false;
 
 void volt::net::submit::submit_message(volt::message_ptr msg)
 {
