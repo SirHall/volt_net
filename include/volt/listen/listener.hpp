@@ -26,16 +26,18 @@ namespace volt
         std::atomic_bool          listener_open;
 
         struct pollfd fds[1];
-        int timeout = 1000;
+        int           timeout = 1000;
 
         void loop();
 
-        int open_socket();
+        int open_socket(std::vector<std::uint16_t> ports);
 
       public:
-        listener();
+        listener(std::vector<std::uint16_t> ports);
 
         ~listener();
+
+        bool is_open();
 
         void accept_new_connection();
 
