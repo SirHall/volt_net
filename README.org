@@ -9,19 +9,13 @@
   VoltNet provides a message-layer over the top of TCP's stream-based
   connections.
 
-* TODO Add unit tests for endianness handler
-
-* TODO Write up user-manual
-
-* TODO Comment all source code
-
-* TODO Add in Doxygen generation to build process
-
-* TODO Provide examples
-
-* TODO More tests
-
-* TODO Ensure full compatibility with Windows on Cygwin and MSYS2
-
-* TODO Code coverage generation
+* TODO
+  + Add unit tests for endianness handler
+  + Write up user-manual
+  + Comment all source code
+  + Add in Doxygen generation to build process
+  + Provide examples
+  + More tests
+  + Ensure full compatibility with Windows on Cygwin and MSYS2
+  + Code coverage generation
 
