@@ -9,7 +9,7 @@
   VoltNet provides a message-layer over the top of TCP's stream-based
   connections.
 
-* TODO
+* Planned
   + Add unit tests for endianness handler
   + Write up user-manual
   + Comment all source code
