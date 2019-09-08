@@ -1,9 +1,27 @@
 * VoltNet
-  VoltNet is meant to be a lightweight TCP networking library that thinly
-  wraps around UNIX TCP sockets.
+  VoltNet is aimed at being a lightweight TCP networking library that thinly
+  wraps around UNIX TCP sockets and should be both compatible with *NIX-based
+  and Windows systems using Cygwin and MSYS2.
 
   This library is very early in development and therefore isn't industry
-  ready. 
+  ready.
 
-  It aims to provide a message-based wrapper to the stream-based connection
-  used by TCP.
+  VoltNet provides a message-layer over the top of TCP's stream-based
+  connections.
+
+* TODO Add unit tests for endianness handler
+
+* TODO Write up user-manual
+
+* TODO Comment all source code
+
+* TODO Add in Doxygen generation to build process
+
+* TODO Provide examples
+
+* TODO More tests
+
+* TODO Ensure full compatibility with Windows on Cygwin and MSYS2
+
+* TODO Code coverage generation
+
