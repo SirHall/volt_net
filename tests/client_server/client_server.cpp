@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         }
 
         for (int i = 0; i < 10; i++)
-            int con_res = volt::net_con::server_connect("localhost", "64420");
+            volt::net_con::server_connect("localhost", "64420");
 
         while (true)
         {
@@ -118,7 +118,8 @@ int main(int argc, char *argv[])
             {
                 auto lock = volt::net_con::aquire_lock();
 
-                for (int i = 0; i < volt::net_con::con_count(lock); i++)
+                for (unsigned int i = 0; i < volt::net_con::con_count(lock);
+                     i++)
                 {
                     if (auto &con = volt::net_con::get_con(i, lock))
                     {
