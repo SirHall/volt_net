@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "volt/listen/listener.hpp"
 #include "volt/messages/msg_writer.hpp"
 #include "volt/net_con.hpp"
@@ -7,6 +5,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <thread>
