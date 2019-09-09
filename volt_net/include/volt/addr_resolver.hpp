@@ -3,7 +3,9 @@
 #define addr_resolver_hpp
 
 // For addrinfo to work nicely
-// #define _POSIX_C_SOURCE 200112L
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#endif
 
 #include <memory>
 #include <netdb.h>
