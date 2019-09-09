@@ -13,9 +13,10 @@
   + Add unit tests for endianness handler
   + Write up user-manual
   + Comment all source code
-  + Add in Doxygen generation to build process
   + Provide examples
   + More tests
   + Ensure full compatibility with Windows on Cygwin and MSYS2
   + Code coverage generation
+  + Add direct support for WIN32 and Win sockets
+  + Add network serialization support for floats/doubles.
 
