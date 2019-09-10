@@ -190,8 +190,8 @@ volt::net_con::~net_con()
 }
 
 // Currently only supports IPv4
-int volt::net_con::server_connect(std::string const address,
-                                  std::string const port)
+bool volt::net_con::server_connect(std::string const address,
+                                   std::string const port)
 {
     // int  socket_fd;
     // auto addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());

@@ -104,39 +104,123 @@ namespace volt
 
       public:
         // No copying is allowed
+        /**
+         * @brief Forbids network connection object copying
+         *
+         * @param other The other instance of net_con
+         */
         net_con(net_con const &other) = delete;
+        /**
+         * @brief Destroy the net con object
+         *
+         */
         ~net_con();
 
+        /**
+         * @brief Gets this connection's connection id
+         *
+         * @return volt::con_id This connection's connection id
+         */
         volt::con_id get_con_id() const { return id; }
 
-        // Attempts to connect to a listening server, returns state
-        static int server_connect(std::string const address,
-                                  std::string const port);
+        /**
+         * @brief Attempts to connect to a listening server
+         *
+         * @param address The target address to connect to
+         * @param port The target port to connect through
+         * @return bool Returns whether or not a connection was established
+         */
+        static bool server_connect(std::string const address,
+                                   std::string const port);
 
 #pragma region Message Transmission
 
+        /**
+         * @brief Sends a message over the connection
+         *
+         * @param m The message to send
+         * @return true The message was sent successfully
+         * @return false The message could not be sent
+         */
         bool send_msg(volt::message_ptr const &m);
 
 #pragma endregion
 
-#pragma region GLobal Functions
+#pragma region Global Functions
 
+        /**
+         * @brief Creates a new connection instance
+         *
+         * @param con_file_descriptor The file descriptor the connection data is
+         * sent/recieved on
+         * @param lock The lock giving us permission to create a new connection
+         * @return volt::con_id The connection id of this new connection
+         */
         static volt::con_id new_connection(int           con_file_descriptor,
                                            aquired_lock &lock);
 
+        /**
+         * @brief Checks for the existance of a connection
+         *
+         * @param id The connection id of the connection to be checed
+         * @param lock The lock allowing us to perform this check
+         * @return true The connection does exist
+         * @return false The connection does not exist
+         */
         static bool con_exists(con_id id, aquired_lock &lock);
 
+        /**
+         * @brief Sends a message over any connection
+         *
+         * @param id The id to send the message over
+         * @param msg The message to send over the connection
+         * @param lock The lock allowing us to access the connection object
+         * @return true The connection was sent successfully
+         * @return false THe message could not be sent
+         */
         static bool send_msg_to(volt::con_id id, volt::message_ptr &msg,
                                 aquired_lock &lock);
 
+        /**
+         * @brief Finds the total number of connections
+         *
+         * @param lock The lock allowing us to access this data
+         * @return std::size_t The number of active connections
+         */
         static std::size_t con_count(aquired_lock &lock);
 
+        /**
+         * @brief Aquires the lock required to perform many static net_con calls
+         *
+         * @return aquired_lock The lock that gives permission to perform the
+         * calls
+         */
         static aquired_lock aquire_lock();
 
+        /**
+         * @brief Get a list of all active connection's, connection id's
+         *
+         * @param lock The lock giving us permission to access the connection id
+         * list
+         * @return std::vector<volt::con_id> The list of all connection id's
+         */
         static std::vector<volt::con_id> get_con_ids(aquired_lock &lock);
 
+        /**
+         * @brief Closes any specified connection
+         *
+         * @param id The id of the connection to close
+         * @param lock The lock giving us permission to close this connection
+         */
         static void close_con(con_id id, aquired_lock &lock);
 
+        /**
+         * @brief Get a connection object by its connection id
+         *
+         * @param id The connection id to search for
+         * @param lock The lock that gives us permission to access this object
+         * @return connection_ptr& The connection searched for
+         */
         static connection_ptr &get_con(con_id id, aquired_lock &lock);
 
 #pragma endregion
