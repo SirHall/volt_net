@@ -189,35 +189,9 @@ volt::net_con::~net_con()
     std::cout << "Connection closed" << std::endl;
 }
 
-// Currently only supports IPv4
 bool volt::net_con::server_connect(std::string const address,
                                    std::string const port)
 {
-    // int  socket_fd;
-    // auto addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
-    // uint16_t    port = volt::default_port;
-    // std::size_t len = sizeof(sockaddr_in);
-    // memset(addr.get(), 0, len);
-
-    // Get the socket file descriptor for the new socket
-    // Addr settings
-    // ((sockaddr_in *)addr.get())->sin_family      = AF_INET; // TCP
-    // ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
-    // uint16_t port_int = 0;
-    // try
-    // {
-    //     port_int = std::stoi(port, nullptr, 10);
-    // }
-    // catch (const std::invalid_argument &ia)
-    // {
-    //     std::cerr << "Invalid argument for port: " << ia.what() << '\n';
-    //     return -1;
-    // }
-    // ((sockaddr_in *)addr.get())->sin_port = htons(port_int);
-
-    // std::cout << "Attempting connection on socket: " << socket_fd
-    //           << " port: " << port_int << std::endl;
-
     auto addrs_found = volt::net::resolve_address(address, port);
 
     // Attempt to connect to each address structure found
@@ -233,12 +207,12 @@ bool volt::net_con::server_connect(std::string const address,
                 auto lock = volt::net_con::aquire_lock();
                 volt::net_con::new_connection(socket_fd, lock);
             }
-            return con_result; // We found a working address
+            return true; // We found a working address
         }
         close(socket_fd); // Close the old socket
     }
 
-    return -1; // We could not connect
+    return false; // We could not connect
 }
 
 void volt::net_con::close_self()
