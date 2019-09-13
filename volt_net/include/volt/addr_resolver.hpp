@@ -15,16 +15,32 @@
 
 namespace volt::net
 {
+    /**
+     * @brief A functor that frees a addrinfo struct from memory
+     *
+     */
     struct addrinfo_deletor
     {
+        /**
+         * @brief Frees any passes addrinfo struct from memory
+         *
+         * @param addr
+         */
         void operator()(struct addrinfo *addr);
     };
 
     typedef std::unique_ptr<struct addrinfo, addrinfo_deletor> addrinfo_ptr;
 
-    // Given an address and port will attempt to resolve an address structor.
-    // Will return the address structure as a smart pointer. Use inside if()
-    // statement to test success.
+    /**
+     * @brief     Given an address and port will attempt to resolve an address
+     * structor. Will return the address structure as a smart pointer. Use
+     * inside an if() statement to test success
+     *
+     * @param address The address to attempt an address resolution for
+     * @param port The port to search
+     * @return addrinfo_ptr The resulting addrinfo struct wrapped in a smart
+     * pointer with custom destructor
+     */
     addrinfo_ptr resolve_address(std::string const address,
                                  std::string const port);
 } // namespace volt::net
