@@ -11,37 +11,41 @@ void volt::listener::loop()
 int volt::listener::open_socket()
 {
     // Get the socket file descriptor for the new socket
-    socket_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    socket_fd = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
+    int reuse_op     = 1;
+    int ipv6_only_op = 0;
     // When destroying this socket we want it to instantly free so we can re-use
     // it on the next server launch
-    int op = 1;
-    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &op, sizeof(int));
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_op, sizeof(int));
+    // Allow connections from both IPv6 and IPv4
+    setsockopt(socket_fd, SOL_SOCKET, IPV6_V6ONLY, &ipv6_only_op, sizeof(int));
 
     // Setup polling so we can check for new connections
 
-    // TODO temporary
-    addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
+    addr = std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in6());
 
     // Addr settings
-    ((sockaddr_in *)addr.get())->sin_family      = AF_INET; // TCP
-    ((sockaddr_in *)addr.get())->sin_addr.s_addr = INADDR_ANY;
+    ((sockaddr_in6 *)addr.get())->sin6_family = AF_INET6; // TCP
+    ((sockaddr_in6 *)addr.get())->sin6_addr   = in6addr_any;
     // This is modified again below
-    ((sockaddr_in *)addr.get())->sin_port = htons(port);
+    ((sockaddr_in6 *)addr.get())->sin6_port = htons(port);
 
-    int b_res = bind(socket_fd, (sockaddr *)addr.get(), sizeof(sockaddr_in));
+    int b_res = bind(socket_fd, (sockaddr *)addr.get(), sizeof(sockaddr_in6));
 
     // Bind this file descriptor to a port
     if (b_res < 0)
     {
         std::cerr << b_res << " Failed to bind port " << port << " to socket"
                   << std::endl;
+        close(socket_fd);
         return -1;
         // TODO: Handle error
     }
     else if (listen(socket_fd, backlog) == -1)
     {
         std::cerr << "Failed to listen on " << socket_fd << std::endl;
+        close(socket_fd);
         return -1;
         // TODO: Handle error
     }
@@ -92,8 +96,8 @@ void volt::listener::accept_new_connection()
     else if (poll_res > 0)
     { // New connection
         auto new_addr =
-            std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in());
-        socklen_t len = sizeof(sockaddr_in);
+            std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in6());
+        socklen_t len = sizeof(sockaddr_in6);
 
         std::cout << "\t\tWaiting for new connection on " << socket_fd
                   << std::endl;
