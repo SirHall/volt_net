@@ -14,6 +14,11 @@
 
 namespace volt
 {
+    /**
+     * @brief Listens for new connection requests in the background and
+     * contructs new net_con intances upon a new connection
+     *
+     */
     class listener
     {
       private:
