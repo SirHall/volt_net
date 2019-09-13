@@ -33,6 +33,10 @@ namespace volt
     class net_con;
     typedef std::unique_ptr<volt::net_con> connection_ptr;
 
+    /**
+     * @brief The class that holds all data related to a network connection
+     *
+     */
     class net_con
     {
         friend class std::unique_ptr<net_con>;
