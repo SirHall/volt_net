@@ -10,6 +10,11 @@
 
 namespace volt
 {
+    /**
+     * @brief Reads and helps to transform binary data from a given message back
+     * into objects.
+     *
+     */
     class msg_reader
     {
       private:
