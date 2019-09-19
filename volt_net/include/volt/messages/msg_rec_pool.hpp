@@ -2,7 +2,7 @@
 #ifndef msg_rec_pool_hpp
 #define msg_rec_pool_hpp
 
-#include "volt/global_events/global_event.hpp"
+#include "volt/event/global_event.hpp"
 #include "volt/messages/msg_reader.hpp"
 #include "volt/volt_defs.hpp"
 #include <mutex>

@@ -1,9 +1,9 @@
 #include "volt/net_con.hpp"
 // #include "volt/con_pool.hpp"
 #include "volt/addr_resolver.hpp"
+#include "volt/event/global_event.hpp"
 #include "volt/event_types/e_closed_con.hpp"
 #include "volt/event_types/e_new_con.hpp"
-#include "volt/global_events/global_event.hpp"
 #include "volt/volt_defs.hpp"
 
 #include <assert.h>
@@ -104,7 +104,6 @@ void volt::net_con::recieve_next_buf()
         auto poll_res = poll(fds, 1, timeout);
         if (poll_res == -1)
         {
-            std::cerr << "Error occured while polling " << std::endl;
             close_self();
             // volt::con_pool::con_delete(this->get_con_id());
             return;
@@ -120,13 +119,11 @@ void volt::net_con::recieve_next_buf()
 
     if (len < 0)
     { // An error has occurred
-        std::cerr << "Error occured when recieving a message" << std::endl;
         close_self();
         // volt::con_pool::con_delete(this->get_con_id());
     }
     if (len == 0)
     { // Connection closed
-        std::cerr << "Connection has been lost" << std::endl;
         close_self();
         // volt::con_pool::con_delete(this->get_con_id());
     }
@@ -185,8 +182,6 @@ volt::net_con::~net_con()
     // volt::con_pool::con_delete(this->get_con_id());
     using namespace volt::event;
     global_event<e_closed_con>::call_event(e_closed_con(this->get_con_id()));
-
-    std::cout << "Connection closed" << std::endl;
 }
 
 bool volt::net_con::server_connect(std::string const address,
@@ -226,7 +221,6 @@ void volt::net_con::loop()
 {
     while (con_open)
         recieve_msg();
-    std::cout << "Connection loop finished" << std::endl;
 }
 
 void volt::net_con::recieve_msg()

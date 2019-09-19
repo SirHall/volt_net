@@ -36,21 +36,16 @@ int volt::listener::open_socket()
     // Bind this file descriptor to a port
     if (b_res < 0)
     {
-        std::cerr << b_res << " Failed to bind port " << port << " to socket"
-                  << std::endl;
         close(socket_fd);
         return -1;
         // TODO: Handle error
     }
     else if (listen(socket_fd, backlog) == -1)
     {
-        std::cerr << "Failed to listen on " << socket_fd << std::endl;
         close(socket_fd);
         return -1;
         // TODO: Handle error
     }
-
-    std::cout << "Successfully bound to port " << this->port << std::endl;
 
     return 0;
 }
@@ -99,16 +94,11 @@ void volt::listener::accept_new_connection()
             std::unique_ptr<sockaddr>((sockaddr *)new sockaddr_in6());
         socklen_t len = sizeof(sockaddr_in6);
 
-        std::cout << "\t\tWaiting for new connection on " << socket_fd
-                  << std::endl;
         int con_fd = accept(socket_fd, new_addr.get(), &len);
-        std::cout << "Accepted new connection on file descriptor of " << con_fd
-                  << std::endl;
 
         if (con_fd < 0)
         {
-            std::cerr << "Error accepting new con on file descriptor " << con_fd
-                      << std::endl;
+            // There was an error accepting the new connection
         }
         else
         {

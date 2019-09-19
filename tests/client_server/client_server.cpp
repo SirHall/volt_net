@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "volt/global_events/observer.hpp"
+#include "volt/event/observer.hpp"
 #include "volt/listen/listener.hpp"
 #include "volt/messages/msg_reader.hpp"
 #include "volt/messages/msg_rec_pool.hpp"

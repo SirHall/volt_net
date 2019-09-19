@@ -2,7 +2,6 @@
 #ifndef e_new_con_hpp
 #define e_new_con_hpp
 
-#include "volt/global_events/global_event.hpp"
 #include "volt/net_con.hpp"
 #include "volt/volt_defs.hpp"
 

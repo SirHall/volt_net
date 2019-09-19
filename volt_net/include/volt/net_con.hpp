@@ -6,7 +6,7 @@
 #include <poll.h>
 #include <signal.h>
 
-#include "volt/global_events/global_event.hpp"
+#include "volt/event/global_event.hpp"
 #include "volt/messages/msg_reader.hpp"
 #include "volt/messages/msg_rec_pool.hpp"
 #include "volt/messages/msg_writer.hpp"
