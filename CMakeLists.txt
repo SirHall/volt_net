@@ -5,6 +5,9 @@ project(volt_ge_net)
 # Add in volt_net
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/volt_net/)
 
+# Add in volt_event
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dep/volt_event/)
+
 # Setup Dyygen
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
@@ -14,7 +17,7 @@ if (DOXYGEN_FOUND)
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
     message("Doxygen build started")
 
-    add_custom_target( doc_doxygen ALL
+    add_custom_target( doc_doxygen_volt_net ALL
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating API documentation with Doxygen"
