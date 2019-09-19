@@ -15,7 +15,8 @@ find_package (Threads)
 
 add_library(volt_net ${SRCS})
 target_include_directories(volt_net PUBLIC ${INCLUDE_DIR})
-target_link_libraries (volt_net ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(volt_net volt_event)
 # SET(GXX_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 # Flags
 # if(MSVC)
