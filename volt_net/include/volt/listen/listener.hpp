@@ -6,11 +6,16 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
-#include <netinet/in.h>
-#include <poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <thread>
+// #include <netinet/in.h>
+// #include <poll.h>
+// #include <sys/socket.h>
+// #include <sys/types.h>
+
+#include <boost/asio.hpp>
+// #include <boost/asio/io_context.hpp>
+
+using boost::asio::ip::tcp;
 
 namespace volt
 {
@@ -22,6 +27,11 @@ namespace volt
     class listener
     {
       private:
+        tcp::acceptor           ipv4_acceptor;
+        tcp::acceptor           ipv6_acceptor;
+        boost::asio::io_context io_context;
+        tcp::socket             sock;
+
         // TODO Change this into the generic sockaddr struct
         std::unique_ptr<sockaddr> addr;
         int                       socket_fd = 0;
@@ -30,12 +40,12 @@ namespace volt
         std::thread               thr;
         std::atomic_bool          listener_open;
 
-        struct pollfd fds[1];
-        int           timeout = 1000;
+        // struct pollfd fds[1];
+        int timeout = 1000;
 
         void loop();
 
-        int open_socket();
+        // int open_socket();
 
         void accept_new_connection();
 
