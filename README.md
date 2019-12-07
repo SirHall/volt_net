@@ -1,7 +1,12 @@
 # VoltNet
   VoltNet is aimed at being a lightweight TCP networking library that thinly
   wraps around UNIX TCP sockets and should be both compatible with *NIX-based
-  and Windows systems using Cygwin and MSYS2.
+  and Windows systems.
+
+  At the moment this library is built on-top of Boost.Asio which integrates
+  the proposed Networking TS library that is *probably* due for C++23.
+  This means that when the Networking TS library does ship, VoltNet can
+  very easily transition over to using 100% standard C++.
 
   This library is very early in development and therefore isn't industry
   ready.
@@ -17,5 +22,7 @@
 - More tests
 - Ensure full compatibility with Windows on Cygwin and MSYS2
 - Code coverage generation
-- Add direct support for WIN32 and Win sockets
 - Add network serialization support for floats/doubles.
+
+# Project Status
+`Transitioning to Boost-based Networking TS`
