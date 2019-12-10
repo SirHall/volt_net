@@ -1,6 +1,8 @@
 #include "volt/messages/msg_rec_pool.hpp"
 #include "volt/messages/msg_reader.hpp"
 
+#include <iostream>
+
 using namespace volt::net;
 
 msg_rec_pool::msg_rec_pool(
@@ -20,8 +22,9 @@ void msg_rec_pool::submit_message(message_ptr msg)
     }
     else
     {
-        volt::event::global_event<reader_ptr>::call_event(
-            make_reader(std::move(msg)));
+        // volt::event::global_event<reader_ptr>::call_event(
+        //     make_reader(std::move(msg)));
+        this->on_msg_received(std::move(msg));
     }
 }
 
@@ -37,7 +40,8 @@ void msg_rec_pool::notify_listeners()
         auto msg = std::move(rec_msg_vec.front());
         rec_msg_vec.pop();
         lock.~lock_guard();
-        volt::event::global_event<reader_ptr>::call_event(
-            make_reader(std::move(msg)));
+        // volt::event::global_event<reader_ptr>::call_event(
+        //     make_reader(std::move(msg)));
+        this->on_msg_received(std::move(msg));
     }
 }
