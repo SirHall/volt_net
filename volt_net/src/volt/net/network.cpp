@@ -10,8 +10,11 @@ using namespace volt::net;
 network::network(std::size_t thread_count, bool defer_received_msgs)
     : running(true), io(std::make_shared<boost::asio::io_context>()),
       net_listener(nullptr),
-      received_msgs(defer_received_msgs, [=](message_ptr) {
-
+      received_msgs(defer_received_msgs, [=](message_ptr msg) {
+          if (this->new_msg_callback)
+          {
+              this->new_msg_callback(make_reader(std::move(msg)));
+          }
       })
 {
     this->thr_pool.reserve(thread_count);
@@ -23,7 +26,7 @@ network::network(std::size_t thread_count, bool defer_received_msgs)
                 if (auto io = this->get_io().lock())
                 {
                     io->run();
-                    if (io->stopped())
+                    if (io->stopped() && this->is_running())
                         io->reset();
                 }
             }
@@ -43,7 +46,9 @@ std::shared_ptr<network> network::create(std::size_t thread_count,
 
 network::~network()
 {
+    // Ensure that we store false in running first before stopping other things
     this->running.store(false);
+    this->io->stop();
     for (auto &thr : this->thr_pool)
         thr.join();
     std::cout << "Joined all network worker threads" << std::endl;
@@ -57,6 +62,23 @@ std::lock_guard<std::recursive_mutex> network::get_guard()
 void network::add_connection(std::unique_ptr<net_con>                     con,
                              std::lock_guard<std::recursive_mutex> const &lck)
 {
+    con->set_new_msg_callback([&](con_id id, message_ptr msg) {
+        auto net_lock = this->get_guard();
+        this->received_msgs.submit_message(std::move(msg));
+    });
+    con->set_closed_callback([&](con_id id) {
+        auto net_lock = this->get_guard();
+        if (!this->running.load())
+            return; // We don't want to delete the net_con object twice
+        auto con_pos = std::find_if(
+            this->connections.begin(), this->connections.begin(),
+            [=](connection_ptr &con) { return con->get_con_id() == id; });
+        if (con_pos != this->connections.end())
+        {
+            // Remove this connection from the list
+            this->connections.erase(con_pos);
+        }
+    });
     this->connections.push_back(std::move(con));
 }
 
@@ -107,7 +129,6 @@ std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>
                     //     tcp::resolver::query resolver_query(
                     //         address, port,
                     //         tcp::resolver::query::numeric_service);
-
                     boost::system::error_code   err;
                     tcp::resolver               resolver(*io);
                     tcp::resolver::results_type endpoints =
@@ -200,7 +221,16 @@ con_id network::get_next_id()
     do
     {
         new_con_id = this->next_id.load();
-    } while (this->next_id.compare_exchange_weak(new_con_id, new_con_id + 1));
+    } while (!this->next_id.compare_exchange_weak(new_con_id, new_con_id + 1));
 
     return new_con_id;
 }
+
+void network::set_new_msg_callback(std::function<void(reader_ptr)> callback)
+{
+    this->new_msg_callback = callback;
+}
+
+void network::process_new_msgs() { this->received_msgs.notify_listeners(); }
+
+std::weak_ptr<network> network::get_net_weak() { return this->self; }

@@ -31,8 +31,9 @@ namespace volt::net
         connection_ptr null_con =
             std::unique_ptr<net_con>(nullptr); // A null connection
 
-        std::unique_ptr<listener> net_listener;
-        msg_rec_pool              received_msgs;
+        std::unique_ptr<listener>       net_listener;
+        msg_rec_pool                    received_msgs;
+        std::function<void(reader_ptr)> new_msg_callback;
 
         network(std::size_t thread_count, bool defer_received_msgs);
 
@@ -70,6 +71,12 @@ namespace volt::net
                              std::uint16_t hostport_ipv6, net_lock const &lck);
 
         con_id get_next_id();
+
+        void set_new_msg_callback(std::function<void(reader_ptr)> callback);
+
+        void process_new_msgs();
+
+        std::weak_ptr<network> get_net_weak();
     };
 } // namespace volt::net
 
