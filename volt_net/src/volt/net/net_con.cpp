@@ -62,11 +62,12 @@ std::unique_ptr<net_con>
 
 void net_con::close_con()
 {
+    if (!this->con_open.load())
+        return;
+    this->con_open.store(false);
     this->sock.cancel();
     this->sock.close();
-    // auto loc_iter = cons_map.find(id);
-    // if (loc_iter != cons_map.end()) // This connection id exists
-    //     cons_map.erase(loc_iter);
+    this->con_closed_callback(this->get_con_id());
 }
 
 // connection_ptr &net_con::get_con(con_id id, aquired_lock &lock)
@@ -131,6 +132,8 @@ void net_con::close_con()
 
 bool net_con::get_next_byte(net_word &next_byte)
 {
+    // std::cout << (msg_size == 0) << " " << (current_index >= msg_size) << " "
+    //           << !this->is_open() << std::endl;
     if ((msg_size == 0) || (current_index >= msg_size) || !this->is_open())
     {
         current_index = 0;
@@ -152,18 +155,20 @@ bool net_con::get_next_byte(net_word &next_byte)
 net_con::net_con(tcp::socket                              connected_socket,
                  std::shared_ptr<boost::asio::io_context> io_context,
                  con_id                                   connection_id)
-    : sock(std::move(connected_socket)), io(io_context),
-      send_strand(*io_context), recv_strand(*io_context), id(connection_id)
+    : sock(std::move(connected_socket)), con_open(true), io(io_context),
+      send_strand(*io_context), recv_strand(*io_context), id(connection_id),
+      is_reading(false), recv_msg(msg_pool::get_message())
 {
+    this->recv_msg->resize(0);
+    this->buff.resize(2048);
 }
 
 net_con::~net_con()
 {
-    // std::cout << "Joining thread" << std::endl;
-    this->sock.cancel();
-    this->sock.close();
-    using namespace volt::event;
-    global_event<e_closed_con>::call_event(e_closed_con(this->get_con_id()));
+    this->close_con();
+    std::cout << "NetCon closed" << std::endl;
+    // using namespace volt::event;
+    // global_event<e_closed_con>::call_event(e_closed_con(this->get_con_id()));
 }
 
 void net_con::schedule_read_handler()
@@ -180,13 +185,15 @@ void net_con::schedule_read_handler()
 void net_con::handle_read(const boost::system::error_code &err,
                           std::size_t                      bytes_transferred)
 {
+    // if (this->recv_msg)
+    this->msg_size = bytes_transferred;
     if (!err)
     {
-        if (!this->recv_msg)
-        {
-            this->recv_msg = msg_pool::get_message();
-            this->recv_msg->resize(0);
-        }
+        // if (!this->recv_msg)
+        // {
+        //     this->recv_msg = msg_pool::get_message();
+        //     this->recv_msg->resize(0);
+        // }
 
         net_word next_byte = 0;
 
@@ -236,14 +243,36 @@ void net_con::handle_read(const boost::system::error_code &err,
             this->schedule_read_handler();
         }
     }
+    else if (err == boost::asio::error::eof)
+    {
+        std::cout << "Connection closed" << std::endl;
+        this->close_con();
+    }
+    else
+    {
+        std::cout << "Error with reading" << std::endl;
+        this->close_con();
+    }
 }
 
-void net_con::send_msg(message_ptr m)
+void net_con::send_msg(message_ptr const &m)
 {
-    // TODO: Ensure that the message does not get modified or get deleted during
-    // this async call
+    // We could have messages coming in from many different threads
+    auto send_buff_lock = std::lock_guard(this->send_buff_mut);
+
+    send_buff.resize(0);
+    for (std::size_t i = 0; i < m->size(); i++)
+    {
+        send_buff.push_back(m->at(i));
+        if (m->at(i) == escape_val)
+            send_buff.push_back(msg_origi_char);
+    }
+
+    send_buff.push_back(escape_val);
+    send_buff.push_back(msg_end_escaped);
+
     boost::asio::async_write(
-        sock, boost::asio::buffer(*m),
+        sock, boost::asio::buffer(this->send_buff),
         boost::asio::bind_executor(
             send_strand,
             boost::bind(&net_con::handle_write, this,
@@ -254,10 +283,14 @@ void net_con::send_msg(message_ptr m)
 void net_con::handle_write(const boost::system::error_code &err,
                            std::size_t                      bytes_transferred)
 {
-    if (!err) {}
+    if (err)
+    {
+        std::cout << "Error occurred while trying to send message" << std::endl;
+        // this->close_con();
+    }
 }
 
-bool net_con::is_open() { return this->sock.is_open(); }
+bool net_con::is_open() { return this->con_open.load(); }
 
 void net_con::set_closed_callback(std::function<void(con_id)> callback)
 {
@@ -268,6 +301,11 @@ void net_con::set_new_msg_callback(
     std::function<void(con_id, message_ptr)> callback)
 {
     this->new_msg_callback = callback;
+    if (!this->is_reading.load())
+    {
+        this->schedule_read_handler();
+        this->is_reading.store(true);
+    }
 }
 
 #pragma endregion
