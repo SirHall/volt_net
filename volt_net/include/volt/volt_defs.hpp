@@ -9,7 +9,7 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
 // This must be identical across the entire program, servers and clients
-namespace volt
+namespace volt::net
 {
     typedef std::uint16_t buffer_size;
     constexpr buffer_size max_buffer_size = 2048;
@@ -33,12 +33,8 @@ namespace volt
     // Returns a new instance of a message pointer
     message_ptr make_message();
 
-    typedef std::uint8_t prot_identifier;
-
     // Connection ID's
     typedef std::uint16_t con_id;
-
-    constexpr std::uint16_t default_port = 64426;
-} // namespace volt
+} // namespace volt::net
 
 #endif

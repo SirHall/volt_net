@@ -4,44 +4,51 @@
 
 #include "volt/volt_defs.hpp"
 #include "volt/volt_endian.hpp"
-#include <arpa/inet.h>
+// #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
 
-namespace volt::serialize
+namespace volt::net::serialize
 {
     template <typename T>
-    volt::message_ptr write_new(T const &v)
+    message_ptr write_new(T const &v)
     {
-        auto data = std::make_unique<volt::message_t>();
+        auto data = make_message();
         write_into(v, data);
         return data;
     }
 
     // Serialization must be defined for ALL objects
     template <typename T>
-    void write_into(T const &v, volt::message_ptr &data);
+    void write_into(T const &v, message_ptr &data);
+    //     {
+    // #error Cannot use default 'write_into', create a template specialization
+    // of 'write_into' to use with a custom class.
+    //     }
 
     template <typename T>
-    void write_into_array(std::vector<T> const &v, volt::message_ptr &data,
+    void write_into_array(std::vector<T> const &v, message_ptr &data,
                           bool write_size = true)
     {
         if (write_size)
-            write_into<volt::message_array_size>(
-                (volt::message_array_size)v.size(), data);
+            write_into<message_array_size>((message_array_size)v.size(), data);
         for (T inst : v)
             write_into<T>(inst, data);
     }
-} // namespace volt::serialize
+} // namespace volt::net::serialize
 
-namespace volt::deserialize
+namespace volt::net::deserialize
 {
     template <typename T>
     void read_into(message_iter &iterator, T &instance);
+    //     {
+    // #error Cannot use default 'read_into', create a template specialization
+    // of 'read_into' to use with a custom class.
+    //     }
 
     template <typename T>
-    T *read_new(volt::message_iter &iterator)
+    T *read_new(message_iter &iterator)
     {
         T *instance = new T();
         read_into(iterator, *instance);
@@ -71,6 +78,6 @@ namespace volt::deserialize
         return array;
     }
 
-} // namespace volt::deserialize
+} // namespace volt::net::deserialize
 
 #endif

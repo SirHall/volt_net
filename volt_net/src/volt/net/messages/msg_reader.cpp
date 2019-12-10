@@ -17,9 +17,9 @@ msg_reader::msg_reader()
 msg_reader::~msg_reader() { msg_pool::return_message(std::move(msg)); }
 
 // Global
-reader_ptr make_reader() { return std::make_unique<msg_reader>(); }
+reader_ptr volt::net::make_reader() { return std::make_unique<msg_reader>(); }
 
-reader_ptr make_reader(message_ptr msg)
+reader_ptr volt::net::make_reader(message_ptr msg)
 {
     return std::make_unique<msg_reader>(std::move(msg));
 }
