@@ -2,10 +2,10 @@
 #ifndef e_new_con_hpp
 #define e_new_con_hpp
 
-#include "volt/net_con.hpp"
+// #include "volt/net_con.hpp"
 #include "volt/volt_defs.hpp"
 
-namespace volt::event
+namespace volt::net
 {
     /**
      * @brief The data for a global event that fires when any new connection is
@@ -14,17 +14,17 @@ namespace volt::event
      */
     class e_new_con
     {
-      private:
-        const volt::con_id id;
+    private:
+        const con_id id;
 
-      public:
+    public:
         /**
          * @brief Construct a new e_new_con object with the connection id of the
          * new connection
          *
          * @param new_con_id The connection id of this new connection
          */
-        e_new_con(volt::con_id new_con_id);
+        e_new_con(con_id new_con_id);
         /**
          * @brief Forbids object copying
          *
@@ -42,8 +42,8 @@ namespace volt::event
          *
          * @return volt::con_id The connection id of the new connection
          */
-        volt::con_id get_id() const;
+        con_id get_id() const;
     };
-} // namespace volt::event
+} // namespace volt::net
 
 #endif

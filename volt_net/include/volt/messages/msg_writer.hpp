@@ -6,7 +6,7 @@
 #include "volt/serialization/net_serialize.hpp"
 #include <memory>
 
-namespace volt
+namespace volt::net
 {
     /**
      * @brief Prepares a message with data before it is sent over a connection.
@@ -14,16 +14,16 @@ namespace volt
      */
     class msg_writer
     {
-      private:
-        volt::message_ptr msg;
+    private:
+        message_ptr msg;
 
-      public:
+    public:
         /**
          * @brief Construct a new msg writer object given a message
          *
          * @param message A pre-existing message instance
          */
-        msg_writer(volt::message_ptr message);
+        msg_writer(message_ptr message);
 
         /**
          * @brief Construct a new msg writer object and retrieves a message
@@ -48,7 +48,7 @@ namespace volt
         template <typename T>
         void write_msg(T const &instance)
         {
-            volt::serialize::write_into<T>(instance, msg);
+            serialize::write_into<T>(instance, msg);
         }
 
         /**
@@ -57,7 +57,7 @@ namespace volt
          * @return volt::message_ptr& The message instance that this writer is
          * holding
          */
-        volt::message_ptr &get_msg();
+        message_ptr const &get_msg() const;
     };
 
     typedef std::unique_ptr<msg_writer> writer_ptr;
@@ -76,6 +76,6 @@ namespace volt
      */
     writer_ptr make_writer(message_ptr msg);
 
-} // namespace volt
+} // namespace volt::net
 
 #endif

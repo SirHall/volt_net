@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace volt::serialize
+namespace volt::net::serialize
 {
     // template <>
     // void write_into(net_word const &v, volt::message_ptr &data)
@@ -26,7 +26,8 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(message_array_size const &v, volt::message_ptr &data);
+    void write_into(message_array_size const &v, message_ptr &data);
+
     /**
      * @brief Writes a net_word (a single byte) to the message
      *
@@ -35,7 +36,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(net_word const &v, volt::message_ptr &data);
+    void write_into(net_word const &v, message_ptr &data);
 
     /**
      * @brief Writes raw bytes into the array, taking endianness into account
@@ -46,7 +47,7 @@ namespace volt::serialize
      * @param write_size [deprecated]
      */
     void write_into_array(net_word const *begin, net_word const *end,
-                          volt::message_ptr &data, bool write_size = true);
+                          message_ptr &data, bool write_size = true);
 
 #pragma region Safe Integers
 
@@ -58,7 +59,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(char const &v, volt::message_ptr &data);
+    void write_into(char const &v, message_ptr &data);
 
     /**
      * @brief Writes a uint8 to the message
@@ -68,7 +69,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::uint8_t const &v, volt::message_ptr &data);
+    void write_into(std::uint8_t const &v, message_ptr &data);
 
     /**
      * @brief Writes an int8 to the message
@@ -78,7 +79,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::int8_t const &v, volt::message_ptr &data);
+    void write_into(std::int8_t const &v, message_ptr &data);
 
     /**
      * @brief Writes a uint16 to the message
@@ -88,7 +89,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::uint16_t const &v, volt::message_ptr &data);
+    void write_into(std::uint16_t const &v, message_ptr &data);
 
     /**
      * @brief Writes an int16 to the message
@@ -98,7 +99,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::int16_t const &v, volt::message_ptr &data);
+    void write_into(std::int16_t const &v, message_ptr &data);
 
     /**
      * @brief Writes a uint32 to the message
@@ -108,7 +109,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::uint32_t const &v, volt::message_ptr &data);
+    void write_into(std::uint32_t const &v, message_ptr &data);
 
     /**
      * @brief Writes an int32 to the message
@@ -118,7 +119,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::int32_t const &v, volt::message_ptr &data);
+    void write_into(std::int32_t const &v, message_ptr &data);
 
     /**
      * @brief Writes a uint64 to the message
@@ -128,7 +129,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::uint64_t const &v, volt::message_ptr &data);
+    void write_into(std::uint64_t const &v, message_ptr &data);
 
     /**
      * @brief Writes an int64 to the message
@@ -138,7 +139,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::int64_t const &v, volt::message_ptr &data);
+    void write_into(std::int64_t const &v, message_ptr &data);
 
 #pragma endregion
 
@@ -150,7 +151,7 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(std::string const &v, volt::message_ptr &data);
+    void write_into(std::string const &v, message_ptr &data);
 
     /**
      * @brief Writes a double to the message
@@ -160,11 +161,11 @@ namespace volt::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(double const &v, volt::message_ptr &data);
+    void write_into(double const &v, message_ptr &data);
 
-} // namespace volt::serialize
+} // namespace volt::net::serialize
 
-namespace volt::deserialize
+namespace volt::net::deserialize
 {
 
     namespace unsafe
@@ -289,6 +290,6 @@ namespace volt::deserialize
      */
     template <>
     void read_into(message_iter &iterator, std::string &instance);
-} // namespace volt::deserialize
+} // namespace volt::net::deserialize
 
 #endif

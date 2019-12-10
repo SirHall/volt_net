@@ -1,24 +1,26 @@
 #include "volt/messages/msg_pool.hpp"
 
-static std::vector<volt::message_ptr> msg_vec;
-static std::mutex                     mut;
-static constexpr unsigned int         max_messages = 50;
+using namespace volt::net;
 
-volt::message_ptr volt::msg_pool::get_message()
+static std::vector<message_ptr> msg_vec;
+static std::mutex               mut;
+static constexpr unsigned int   max_messages = 50;
+
+message_ptr volt::net::msg_pool::get_message()
 {
     {
         std::lock_guard guard(mut);
         if (msg_vec.size() > 0)
         {
-            volt::message_ptr msg = std::move(msg_vec.back());
+            message_ptr msg = std::move(msg_vec.back());
             msg_vec.pop_back();
             return msg;
         }
     }
-    return std::move(volt::make_message());
+    return std::move(make_message());
 }
 
-void volt::msg_pool::return_message(volt::message_ptr msg)
+void volt::net::msg_pool::return_message(message_ptr msg)
 {
     std::lock_guard guard(mut);
     if (msg_vec.size() >= max_messages)

@@ -1,18 +1,20 @@
 #pragma once
-#ifndef listener_hpp
-#define listener_hpp
+#ifndef LISTENER_HPP
+#define LISTENER_HPP
 
 #include "volt/net_con.hpp"
+
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <netinet/in.h>
-#include <poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <thread>
 
-namespace volt
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
+
+namespace volt::net
 {
     /**
      * @brief Listens for new connection requests in the background and
@@ -21,32 +23,34 @@ namespace volt
      */
     class listener
     {
-      private:
-        // TODO Change this into the generic sockaddr struct
-        std::unique_ptr<sockaddr> addr;
-        int                       socket_fd = 0;
-        uint16_t                  port      = volt::default_port;
-        int                       backlog   = 10;
-        std::thread               thr;
-        std::atomic_bool          listener_open;
+    private:
+        std::shared_ptr<boost::asio::io_context> io;
+        tcp::acceptor                            ipv4_acceptor;
+        tcp::acceptor                            ipv6_acceptor;
 
-        struct pollfd fds[1];
-        int           timeout = 1000;
+        std::function<void(tcp::socket)> new_con_callback;
+        // I create two new sockets so I don't have to worry about
+        // syncronization between the ipv4 and ipv6 listeners
+        tcp::socket new_sock_ipv4;
+        tcp::socket new_sock_ipv6;
 
-        void loop();
+        std::atomic_bool listener_open;
 
-        int open_socket();
+        void accept_v4(const boost::system::error_code &err);
+        void accept_v6(const boost::system::error_code &err);
+        void accept_new_connection(const boost::system::error_code &err,
+                                   tcp::socket                      socket);
 
-        void accept_new_connection();
-
-      public:
+    public:
         /**
          * @brief Construct a new listener object that listens for new
          * connections on a desired port.
          *
          * @param hostport The port for the listener to find new connections on
          */
-        listener(std::uint16_t hostport);
+        listener(std::uint16_t hostport_ipv4, std::uint16_t hostport_ipv6,
+                 std::function<void(tcp::socket)>         callback,
+                 std::shared_ptr<boost::asio::io_context> io_context);
 
         /**
          * @brief Destroy the listener object
@@ -68,5 +72,5 @@ namespace volt
          */
         void close_listener();
     };
-} // namespace volt
+} // namespace volt::net
 #endif

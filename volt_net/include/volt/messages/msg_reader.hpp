@@ -8,7 +8,7 @@
 #include "volt/volt_defs.hpp"
 #include <memory>
 
-namespace volt
+namespace volt::net
 {
     /**
      * @brief Reads and helps to transform binary data from a given message back
@@ -17,17 +17,17 @@ namespace volt
      */
     class msg_reader
     {
-      private:
-        volt::message_ptr  msg;
-        volt::message_iter iter;
+    private:
+        message_ptr  msg;
+        message_iter iter;
 
-      public:
+    public:
         /**
          * @brief Construct a new msg reader object given a message
          *
          * @param message The pre-existing message for this reader to read from
          */
-        msg_reader(volt::message_ptr message);
+        msg_reader(message_ptr message);
 
         /**
          * @brief Construct a new msg reader without any message
@@ -51,7 +51,7 @@ namespace volt
         template <typename T>
         void read_msg(T &instance)
         {
-            volt::deserialize::read_into<T>(iter, instance);
+            deserialize::read_into<T>(iter, instance);
         }
 
         /**
@@ -64,7 +64,7 @@ namespace volt
         template <typename T>
         void read_msg_int(T &instance)
         {
-            volt::deserialize::read_into_int<T>(iter, instance);
+            deserialize::read_into_int<T>(iter, instance);
         }
     };
 
@@ -84,6 +84,6 @@ namespace volt
      * @return reader_ptr A smart pointer holding the new reader instance
      */
     reader_ptr make_reader(message_ptr msg);
-} // namespace volt
+} // namespace volt::net
 
 #endif

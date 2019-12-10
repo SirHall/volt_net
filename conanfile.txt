@@ -1,6 +1,6 @@
 [requires]
-volt_event/0.0.1@volt/stable
 boost/1.71.0@conan/stable
+volt_event/0.0.1@volt/stable
 
 [generators]
 cmake
