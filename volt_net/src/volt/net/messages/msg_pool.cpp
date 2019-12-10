@@ -6,7 +6,7 @@ static std::vector<message_ptr> msg_vec;
 static std::mutex               mut;
 static constexpr unsigned int   max_messages = 50;
 
-message_ptr msg_pool::get_message()
+message_ptr volt::net::msg_pool::get_message()
 {
     {
         std::lock_guard guard(mut);
@@ -20,7 +20,7 @@ message_ptr msg_pool::get_message()
     return std::move(make_message());
 }
 
-void msg_pool::return_message(message_ptr msg)
+void volt::net::msg_pool::return_message(message_ptr msg)
 {
     std::lock_guard guard(mut);
     if (msg_vec.size() >= max_messages)

@@ -8,12 +8,11 @@
 #include <thread>
 #include <vector>
 
-namespace volt::msg_pool
+namespace volt::net::msg_pool
 {
+    message_ptr get_message();
 
-    volt::message_ptr get_message();
-
-    void return_message(volt::message_ptr msg);
-} // namespace volt::msg_pool
+    void return_message(message_ptr msg);
+} // namespace volt::net::msg_pool
 
 #endif
