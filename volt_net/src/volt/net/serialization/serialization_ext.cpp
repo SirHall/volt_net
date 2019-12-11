@@ -1,4 +1,4 @@
-#include "volt/serialization/serialization_ext.hpp"
+#include "volt/net/serialization/serialization_ext.hpp"
 
 using namespace volt::net;
 

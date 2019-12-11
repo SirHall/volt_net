@@ -2,8 +2,8 @@
 #ifndef serialization_ext_hpp
 #define serialization_ext_hpp
 
-#include "volt/serialization/net_serialize.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/serialization/net_serialize.hpp"
+#include "volt/net/volt_net_defs.hpp"
 #include <string>
 #include <type_traits>
 #include <vector>

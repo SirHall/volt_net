@@ -2,8 +2,8 @@
 #ifndef net_serialize_hpp
 #define net_serialize_hpp
 
-#include "volt/volt_defs.hpp"
-#include "volt/volt_endian.hpp"
+#include "volt/net/volt_endian.hpp"
+#include "volt/net/volt_net_defs.hpp"
 // #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>

@@ -2,10 +2,10 @@
 #ifndef VOLT_NET_NETWORK_HPP
 #define VOLT_NET_NETWORK_HPP
 
-#include "volt/listen/listener.hpp"
-#include "volt/messages/msg_rec_pool.hpp"
 #include "volt/net/AsyncStateHandler.hpp"
-#include "volt/net_con.hpp"
+#include "volt/net/listener.hpp"
+#include "volt/net/messages/msg_rec_pool.hpp"
+#include "volt/net/net_con.hpp"
 
 #include <atomic>
 #include <memory>

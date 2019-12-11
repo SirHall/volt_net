@@ -2,8 +2,8 @@
 #ifndef msg_writer_hpp
 #define msg_writer_hpp
 
-#include "volt/messages/msg_pool.hpp"
-#include "volt/serialization/net_serialize.hpp"
+#include "volt/net/messages/msg_pool.hpp"
+#include "volt/net/serialization/net_serialize.hpp"
 #include <memory>
 
 namespace volt::net

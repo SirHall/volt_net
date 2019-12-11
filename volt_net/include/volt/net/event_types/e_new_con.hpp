@@ -3,7 +3,7 @@
 #define e_new_con_hpp
 
 // #include "volt/net_con.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/volt_net_defs.hpp"
 
 namespace volt::net
 {

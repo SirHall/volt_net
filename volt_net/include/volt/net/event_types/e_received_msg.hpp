@@ -2,8 +2,8 @@
 #ifndef VOLT_NET_EVENT_TYPES_E_RECEIVED_MSG_HPP
 #define VOLT_NET_EVENT_TYPES_E_RECEIVED_MSG_HPP
 
-#include "volt/messages/msg_reader.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/messages/msg_reader.hpp"
+#include "volt/net/volt_net_defs.hpp"
 
 namespace volt::net
 {

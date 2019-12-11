@@ -1,4 +1,4 @@
-#include "volt/messages/msg_reader.hpp"
+#include "volt/net/messages/msg_reader.hpp"
 
 using namespace volt::net;
 

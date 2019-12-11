@@ -3,7 +3,7 @@
 #define msg_rec_pool_hpp
 
 // #include "volt/event/global_event.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/volt_net_defs.hpp"
 #include <functional>
 #include <mutex>
 #include <queue>

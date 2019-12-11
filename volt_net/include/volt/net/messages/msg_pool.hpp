@@ -2,7 +2,7 @@
 #ifndef msg_pool_hpp
 #define msg_pool_hpp
 
-#include "volt/volt_defs.hpp"
+#include "volt/net/volt_net_defs.hpp"
 #include <memory>
 #include <mutex>
 #include <thread>

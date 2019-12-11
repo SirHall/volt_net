@@ -1,17 +1,8 @@
-#include <iostream>
-
-#include "volt/event/observer.hpp"
-#include "volt/listen/listener.hpp"
-#include "volt/messages/msg_reader.hpp"
-#include "volt/messages/msg_rec_pool.hpp"
-#include "volt/net/network.hpp"
-#include "volt/net_con.hpp"
-#include "volt/serialization/net_serialize.hpp"
-#include "volt/serialization/serialization_ext.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net.hpp"
 
 #include <atomic>
 #include <chrono>
+#include <iostream>
 #include <signal.h>
 #include <string>
 #include <thread>

@@ -2,10 +2,10 @@
 #ifndef msg_reader_hpp
 #define msg_reader_hpp
 
-#include "volt/messages/msg_pool.hpp"
-#include "volt/serialization/net_serialize.hpp"
-#include "volt/serialization/serialization_ext.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/messages/msg_pool.hpp"
+#include "volt/net/serialization/net_serialize.hpp"
+#include "volt/net/serialization/serialization_ext.hpp"
+#include "volt/net/volt_net_defs.hpp"
 #include <memory>
 
 namespace volt::net

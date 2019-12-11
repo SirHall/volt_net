@@ -2,7 +2,7 @@
 #ifndef e_closed_con_hpp
 #define e_closed_con_hpp
 
-#include "volt/volt_defs.hpp"
+#include "volt/net/volt_net_defs.hpp"
 
 namespace volt::net
 {

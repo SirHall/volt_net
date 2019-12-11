@@ -1,4 +1,4 @@
-#include "volt/event_types/e_closed_con.hpp"
+#include "volt/net/event_types/e_closed_con.hpp"
 
 using namespace volt::net;
 

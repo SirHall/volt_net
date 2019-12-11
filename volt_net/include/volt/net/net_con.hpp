@@ -7,10 +7,10 @@
 #include <signal.h>
 
 #include "volt/event/global_event.hpp"
-#include "volt/messages/msg_reader.hpp"
-#include "volt/messages/msg_rec_pool.hpp"
-#include "volt/messages/msg_writer.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/messages/msg_reader.hpp"
+#include "volt/net/messages/msg_rec_pool.hpp"
+#include "volt/net/messages/msg_writer.hpp"
+#include "volt/net/volt_net_defs.hpp"
 
 #include <atomic>
 #include <cstdint>

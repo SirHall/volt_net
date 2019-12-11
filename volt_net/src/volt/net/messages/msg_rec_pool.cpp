@@ -1,5 +1,5 @@
-#include "volt/messages/msg_rec_pool.hpp"
-#include "volt/messages/msg_reader.hpp"
+#include "volt/net/messages/msg_rec_pool.hpp"
+#include "volt/net/messages/msg_reader.hpp"
 
 #include <iostream>
 

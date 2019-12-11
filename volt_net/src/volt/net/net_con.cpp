@@ -1,10 +1,10 @@
-#include "volt/net_con.hpp"
+#include "volt/net/net_con.hpp"
 // #include "volt/con_pool.hpp"
 #include "volt/event/global_event.hpp"
-#include "volt/event_types/e_closed_con.hpp"
-#include "volt/event_types/e_new_con.hpp"
+#include "volt/net/event_types/e_closed_con.hpp"
+#include "volt/net/event_types/e_new_con.hpp"
 #include "volt/net/network.hpp"
-#include "volt/volt_defs.hpp"
+#include "volt/net/volt_net_defs.hpp"
 
 #include <assert.h>
 #include <iostream>
