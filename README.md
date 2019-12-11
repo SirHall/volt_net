@@ -25,4 +25,4 @@
 - Add network serialization support for floats/doubles.
 
 # Project Status
-`Transitioning to Boost-based Networking TS`
+`Cleanup`
