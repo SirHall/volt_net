@@ -1,5 +1,4 @@
-#include "volt/net/net_con.hpp"
-// #include "volt/con_pool.hpp"
+﻿#include "volt/net/net_con.hpp"
 #include "volt/event/global_event.hpp"
 #include "volt/net/event_types/e_closed_con.hpp"
 #include "volt/net/event_types/e_new_con.hpp"
@@ -8,17 +7,9 @@
 
 #include <assert.h>
 #include <iostream>
-// #include <poll.h>
 #include <string>
 
 using namespace volt::net;
-
-// static std::unordered_map<volt::con_id, volt::connection_ptr> cons_map;
-
-// static std::recursive_mutex cons_map_mut;
-
-// static std::unique_ptr<volt::net_con> null_con =
-//     std::unique_ptr<volt::net_con>(nullptr);
 
 #pragma region Global Functions
 
@@ -31,35 +22,6 @@ std::unique_ptr<net_con>
         new net_con(std::move(connected_socket), io_context, connection_id));
 }
 
-// bool net_con::con_exists(con_id id, aquired_lock &lock)
-// {
-//     return cons_map.find(id) != cons_map.end();
-// }
-
-// bool volt::net_con::send_msg_to(volt::con_id id, volt::message_ptr &msg,
-//                                 aquired_lock &lock)
-// {
-//     // std::lock_guard lock(cons_map_mut);
-//     return cons_map[id]->send_msg(msg);
-// }
-
-// std::size_t net_con::con_count(aquired_lock &lock) { return cons_map.size();
-// }
-
-// volt::aquired_lock net_con::aquire_lock()
-// {
-//     return std::make_unique<std::lock_guard<std::recursive_mutex>>(
-//         cons_map_mut);
-// }
-
-// std::vector<con_id> net_con::get_con_ids(aquired_lock &lock)
-// {
-//     auto ids = std::vector<con_id>();
-//     for (auto i = cons_map.begin(); i != cons_map.end(); i++)
-//         ids.push_back(i->first);
-//     return ids;
-// }
-
 void net_con::close_con()
 {
     if (!this->con_open.load())
@@ -70,65 +32,9 @@ void net_con::close_con()
     this->con_closed_callback(this->get_con_id());
 }
 
-// connection_ptr &net_con::get_con(con_id id, aquired_lock &lock)
-// {
-//     auto loc_iter = cons_map.find(id);
-//     if (loc_iter != cons_map.end())
-//     { // This is a valid connection
-//         return loc_iter->second;
-//     }
-//     else
-//     { // Invalid connection, it does not exist
-//         return null_con;
-//     }
-// }
-
-// static con_id next_id = 0;
-
-// void net_con::assign_next_id() { id = next_id++; }
-
 #pragma endregion
 
 #pragma region Member Functions
-
-// void net_con::recieve_next_buf()
-// {
-// std::cout << "Recieving next buffer" << std::endl;
-
-// while (true)
-// {
-//     if (!con_open)
-//         return;
-
-//     auto poll_res = poll(fds, 1, timeout);
-//     if (poll_res == -1)
-//     {
-//         close_self();
-//         // volt::con_pool::con_delete(this->get_con_id());
-//         return;
-//     }
-//     else if (poll_res > 0)
-//     {
-//         // std::cout << "Poll found recieved data" << std::endl;
-//         break;
-//     }
-// }
-
-// auto len = recv(con_fd, buff.data(), volt::max_buffer_size, 0);
-
-// if (len < 0)
-// { // An error has occurred
-//     close_self();
-//     // volt::con_pool::con_delete(this->get_con_id());
-// }
-// if (len == 0)
-// { // Connection closed
-//     close_self();
-//     // volt::con_pool::con_delete(this->get_con_id());
-// }
-// msg_size      = len;
-// current_index = 0;
-// }
 
 bool net_con::get_next_byte(net_word &next_byte)
 {
@@ -143,14 +49,6 @@ bool net_con::get_next_byte(net_word &next_byte)
     current_index++;
     return true;
 }
-
-// volt::net_word *volt::net_con::get_next_bytes(std::size_t count)
-// {
-//     volt::net_word *alloc_mem = (volt::net_word *)malloc(count);
-//     for (std::size_t i = 0; i < count; i++)
-//         alloc_mem[i] = get_next_byte();
-//     return alloc_mem;
-// }
 
 net_con::net_con(tcp::socket                              connected_socket,
                  std::shared_ptr<boost::asio::io_context> io_context,
