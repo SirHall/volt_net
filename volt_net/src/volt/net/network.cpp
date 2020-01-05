@@ -1,6 +1,7 @@
-#include "volt/net/network.hpp"
+﻿#include "volt/net/network.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
@@ -9,6 +10,7 @@ using namespace volt::net;
 
 network::network(std::size_t thread_count, bool defer_received_msgs)
     : running(true), io(std::make_shared<boost::asio::io_context>()),
+      work(boost::asio::make_work_guard(io->get_executor())),
       net_listener(nullptr),
       received_msgs(defer_received_msgs, [=](message_ptr msg) {
           if (this->new_msg_callback)
@@ -18,17 +20,13 @@ network::network(std::size_t thread_count, bool defer_received_msgs)
       })
 {
     this->thr_pool.reserve(thread_count);
+
     for (std::size_t i = 0; i < thread_count; i++)
     {
         this->thr_pool.push_back(std::thread([=]() {
-            while (this->is_running())
+            if (auto io_lock = this->get_io().lock())
             {
-                if (auto io = this->get_io().lock())
-                {
-                    io->run();
-                    if (io->stopped() && this->is_running())
-                        io->reset();
-                }
+                io_lock->run();
             }
             std::cout << "Network worker thread closing" << std::endl;
         }));
@@ -46,8 +44,15 @@ std::shared_ptr<network> network::create(std::size_t thread_count,
 
 network::~network()
 {
-    // Ensure that we store false in running first before stopping other things
     this->running.store(false);
+    {
+        auto con_lck = this->get_guard();
+        for (auto &con : this->connections)
+            con->close_con();
+    }
+    if (this->net_listener)
+        this->net_listener->close_listener();
+    this->work.reset();
     this->io->stop();
     for (auto &thr : this->thr_pool)
         thr.join();
@@ -114,56 +119,53 @@ std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>
     auto state = AsyncStateHandler<ServerConnectStatus>::Create();
     state->SetState(ServerConnectStatus::Connecting);
 
-    this->io->post(
-        // TODO: Run this in a separate thread
-        boost::bind(
-            boost::function<void(
-                std::string, std::string, std::weak_ptr<network>,
-                std::shared_ptr<boost::asio::io_context>,
-                std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>)>(
-                [](std::string address, std::string port,
-                   std::weak_ptr<network>                   net,
-                   std::shared_ptr<boost::asio::io_context> io,
-                   std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>
-                       state) {
-                    //     tcp::resolver::query resolver_query(
-                    //         address, port,
-                    //         tcp::resolver::query::numeric_service);
-                    boost::system::error_code   err;
-                    tcp::resolver               resolver(*io);
-                    tcp::resolver::results_type endpoints =
-                        resolver.resolve(address, port, err);
+    this->io->post(boost::bind(
+        boost::function<void(
+            std::string, std::string, std::weak_ptr<network>,
+            std::shared_ptr<boost::asio::io_context>,
+            std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>)>(
+            [](std::string address, std::string port,
+               std::weak_ptr<network>                                  net,
+               std::shared_ptr<boost::asio::io_context>                io,
+               std::shared_ptr<AsyncStateHandler<ServerConnectStatus>> state) {
+                //     tcp::resolver::query resolver_query(
+                //         address, port,
+                //         tcp::resolver::query::numeric_service);
+                boost::system::error_code   err;
+                tcp::resolver               resolver(*io);
+                tcp::resolver::results_type endpoints =
+                    resolver.resolve(address, port, err);
 
-                    if (err)
-                    {
-                        std::cerr << "Error while resolving:\n\t"
-                                  << err.message() << std::endl;
-                        state->SetState(ServerConnectStatus::Failed);
-                        return;
-                    }
+                if (err)
+                {
+                    std::cerr << "Error while resolving:\n\t" << err.message()
+                              << std::endl;
+                    state->SetState(ServerConnectStatus::Failed);
+                    return;
+                }
 
-                    auto new_sock = tcp::socket(*io);
-                    boost::asio::connect(new_sock, endpoints, err);
+                auto new_sock = tcp::socket(*io);
+                boost::asio::connect(new_sock, endpoints, err);
 
-                    if (err)
-                    {
-                        std::cerr << "Error while connecting:\n\t"
-                                  << err.message() << std::endl;
-                        state->SetState(ServerConnectStatus::Failed);
-                        return;
-                    }
+                if (err)
+                {
+                    std::cerr << "Error while connecting:\n\t" << err.message()
+                              << std::endl;
+                    state->SetState(ServerConnectStatus::Failed);
+                    return;
+                }
 
-                    if (auto lock = net.lock())
-                    {
-                        auto con = net_con::new_connection(
-                            std::move(new_sock), io, lock->get_next_id());
-                        auto net_lock = lock->get_guard();
-                        lock->add_connection(std::move(con), net_lock);
-                    }
+                if (auto lock = net.lock())
+                {
+                    auto con = net_con::new_connection(std::move(new_sock), io,
+                                                       lock->get_next_id());
+                    auto net_lock = lock->get_guard();
+                    lock->add_connection(std::move(con), net_lock);
+                }
 
-                    state->SetState(ServerConnectStatus::Connected);
-                }),
-            address, port, this->self, io, state));
+                state->SetState(ServerConnectStatus::Connected);
+            }),
+        address, port, this->self, io, state));
 
     return state;
 }
