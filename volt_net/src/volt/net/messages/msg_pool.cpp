@@ -25,7 +25,5 @@ void volt::net::msg_pool::return_message(message_ptr msg)
     std::lock_guard guard(mut);
     if (msg_vec.size() >= max_messages)
         msg_vec.push_back(std::move(msg));
-    else
-        msg.~unique_ptr();
     // Otherwise, just destroy the message
 }
