@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef connection_hpp
 #define connection_hpp
 
@@ -95,7 +95,7 @@ namespace volt::net
 
 #pragma endregion
 
-#pragma Recieve From Recieve - Buffer
+#pragma region Recieve From Recieve - Buffer
 
         // void recieve_next_buf();
 
