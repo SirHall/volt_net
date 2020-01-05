@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef VOLT_NET_NETWORK_HPP
 #define VOLT_NET_NETWORK_HPP
 
@@ -27,6 +27,8 @@ namespace volt::net
         std::weak_ptr<network>                   self;
         std::vector<std::thread>                 thr_pool;
         std::atomic<con_id>                      next_id = 0;
+        boost::asio::executor_work_guard<boost::asio::io_context::executor_type>
+            work;
 
         connection_ptr null_con =
             std::unique_ptr<net_con>(nullptr); // A null connection
