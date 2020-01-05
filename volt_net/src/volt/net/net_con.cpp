@@ -169,13 +169,15 @@ void net_con::send_msg(message_ptr const &m)
     send_buff.push_back(escape_val);
     send_buff.push_back(msg_end_escaped);
 
-    boost::asio::async_write(
-        sock, boost::asio::buffer(this->send_buff),
-        boost::asio::bind_executor(
-            send_strand,
-            boost::bind(&net_con::handle_write, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred)));
+    boost::asio::write(sock, boost::asio::buffer(this->send_buff));
+    // TODO: Use async send
+    // boost::asio::async_write(
+    //    sock, boost::asio::buffer(this->send_buff),
+    //    boost::asio::bind_executor(
+    //        send_strand,
+    //        boost::bind(&net_con::handle_write, this,
+    //                    boost::asio::placeholders::error,
+    //                    boost::asio::placeholders::bytes_transferred)));
 }
 
 void net_con::handle_write(const boost::system::error_code &err,
