@@ -34,14 +34,14 @@ void msg_rec_pool::notify_listeners()
         return;
     while (true)
     {
-        std::lock_guard lock(mut);
-        if (rec_msg_vec.size() == 0)
-            break;
-        auto msg = std::move(rec_msg_vec.front());
-        rec_msg_vec.pop();
-        lock.~lock_guard();
-        // volt::event::global_event<reader_ptr>::call_event(
-        //     make_reader(std::move(msg)));
+        volt::net::message_ptr msg;
+        {
+            std::lock_guard lock(mut);
+            if (rec_msg_vec.size() == 0)
+                break;
+            msg = std::move(rec_msg_vec.front());
+            rec_msg_vec.pop();
+        }
         this->on_msg_received(std::move(msg));
     }
 }
