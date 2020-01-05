@@ -1,4 +1,4 @@
-#include "volt/net/listener.hpp"
+﻿#include "volt/net/listener.hpp"
 
 #include <boost/bind.hpp>
 
@@ -79,6 +79,4 @@ void listener::close_listener()
     this->ipv4_acceptor.close();
     this->ipv6_acceptor.cancel();
     this->ipv6_acceptor.close();
-
-    // close(socket_fd);
 }
