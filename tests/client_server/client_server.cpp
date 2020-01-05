@@ -1,4 +1,4 @@
-#include "volt/net.hpp"
+﻿#include "volt/net.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -155,26 +155,6 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-
-            // {
-            //     auto lock = std::lock_guard(cnt_mut);
-            //     if (msgs_recieved >= 100)
-            //     {
-            //         std::cout << "Test succeeded, all data transfered
-            //         correctly"
-            //                   << std::endl;
-            //         break;
-            //     }
-            //     if (error_quit)
-            //         break;
-            // }
-            // if (error_quit)
-            // {
-            //     std::cerr << "Error occurred, forcefully closing the server"
-            //               << std::endl;
-            //     return 1;
-            // }
-
             network->process_new_msgs();
         }
     }
