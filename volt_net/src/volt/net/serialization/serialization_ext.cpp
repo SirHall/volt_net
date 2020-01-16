@@ -2,13 +2,14 @@
 
 using namespace volt::net;
 
-void serialize::write_into_array(net_word const *begin, net_word const *end,
-                                 message_ptr &data, bool write_size)
+void serialize::write_into_byte_array(net_word const *begin,
+                                      net_word const *end, message_ptr &data,
+                                      bool correct_endianness, bool write_size)
 {
     if (write_size)
         write_into<message_array_size>((message_array_size)(end - begin), data);
     data->reserve(data->size() + (end - begin));
-    if (volt::net::is_big_endian())
+    if (volt::net::is_big_endian() || !correct_endianness)
         for (auto it = begin; it < end; it++)
             write_into<net_word>(*it, data);
     else
@@ -21,63 +22,66 @@ void serialize::write_into_array(net_word const *begin, net_word const *end,
 template <>
 void serialize::write_into(char const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(char), data,
-                     false);
+    write_into_byte_array((net_word *)&v, (net_word *)&v + sizeof(char), data,
+                          true, false);
 }
 
 template <>
-void serialize::write_into(std::uint8_t const &v, message_ptr &data)
+void serialize::write_into(net_word const &v, message_ptr &data)
 {
-    data->push_back(v);
+    write_byte(v, data);
 }
 
 template <>
 void serialize::write_into(std::int8_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int8_t), data,
-                     false);
+    write_into_byte_array((net_word *)&v, (net_word *)&v + sizeof(std::int8_t),
+                          data, true, false);
 }
 
 template <>
 void serialize::write_into(std::uint16_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint16_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v,
+                          (net_word *)&v + sizeof(std::uint16_t), data, true,
+                          false);
 }
 
 template <>
 void serialize::write_into(std::int16_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int16_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v, (net_word *)&v + sizeof(std::int16_t),
+                          data, true, false);
 }
 
 template <>
 void serialize::write_into(std::uint32_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint32_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v,
+                          (net_word *)&v + sizeof(std::uint32_t), data, true,
+                          false);
 }
 
 template <>
 void serialize::write_into(std::int32_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int32_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v, (net_word *)&v + sizeof(std::int32_t),
+                          data, true, false);
 }
 
 template <>
 void serialize::write_into(std::uint64_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::uint64_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v,
+                          (net_word *)&v + sizeof(std::uint64_t), data, true,
+                          false);
 }
 
 template <>
 void serialize::write_into(std::int64_t const &v, message_ptr &data)
 {
-    write_into_array((net_word *)&v, (net_word *)&v + sizeof(std::int64_t),
-                     data, false);
+    write_into_byte_array((net_word *)&v, (net_word *)&v + sizeof(std::int64_t),
+                          data, true, false);
 }
 
 #pragma endregion
@@ -98,8 +102,8 @@ void serialize::write_into(double const &v, message_ptr &data)
 {
     if (std::numeric_limits<double>::is_iec559)
     {
-        write_into_array((net_word *)&v, ((net_word *)&v) + sizeof(double),
-                         data, false);
+        write_into_byte_array((net_word *)&v, ((net_word *)&v) + sizeof(double),
+                              data, true, false);
         return;
     }
     // Not IEEE 574 format, build representation manually

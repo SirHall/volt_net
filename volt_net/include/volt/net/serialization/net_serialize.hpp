@@ -36,6 +36,20 @@ namespace volt::net::serialize
         for (T inst : v)
             write_into<T>(inst, data);
     }
+
+    inline void write_byte(std::uint8_t v, message_ptr &data)
+    {
+        data->push_back(v);
+        if (v == escape_val)
+            data->push_back(msg_origi_char);
+    }
+
+    inline void end_msg(message_ptr &data)
+    {
+        data->push_back(escape_val);
+        data->push_back(msg_end_escaped);
+    }
+
 } // namespace volt::net::serialize
 
 namespace volt::net::deserialize

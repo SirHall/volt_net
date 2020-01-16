@@ -46,8 +46,9 @@ namespace volt::net::serialize
      * @param data The message to write the source byte array to
      * @param write_size [deprecated]
      */
-    void write_into_array(net_word const *begin, net_word const *end,
-                          message_ptr &data, bool write_size = true);
+    void write_into_byte_array(net_word const *begin, net_word const *end,
+                               message_ptr &data, bool correct_endianness,
+                               bool write_size);
 
 #pragma region Safe Integers
 
@@ -59,7 +60,7 @@ namespace volt::net::serialize
      * @param data The message to write to
      */
     template <>
-    void write_into(char const &v, message_ptr &data);
+    void write_into(std::int8_t const &v, message_ptr &data);
 
     /**
      * @brief Writes a uint8 to the message
