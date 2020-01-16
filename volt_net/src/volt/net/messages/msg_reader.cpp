@@ -14,7 +14,10 @@ msg_reader::msg_reader()
     iter = msg->begin();
 }
 
-msg_reader::~msg_reader() { msg_pool::return_message(msg); }
+msg_reader::~msg_reader()
+{
+    //  msg_pool::return_message(msg);
+}
 
 // Global
 reader_ptr volt::net::make_reader() { return std::make_unique<msg_reader>(); }
