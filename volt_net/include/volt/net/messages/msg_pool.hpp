@@ -12,7 +12,7 @@ namespace volt::net::msg_pool
 {
     message_ptr get_message();
 
-    void return_message(message_ptr msg);
+    void return_message(std::vector<net_word> *msg);
 } // namespace volt::net::msg_pool
 
 #endif

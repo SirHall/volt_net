@@ -20,10 +20,12 @@ message_ptr volt::net::msg_pool::get_message()
     return make_message();
 }
 
-void volt::net::msg_pool::return_message(message_ptr msg)
+void volt::net::msg_pool::return_message(std::vector<net_word> *msg)
 {
     std::lock_guard guard(mut);
     if (msg_vec.size() >= max_messages)
-        msg_vec.push_back(std::move(msg));
+        msg_vec.push_back(std::shared_ptr<std::vector<net_word>>(msg));
+    else
+        delete msg;
     // Otherwise, just destroy the message
 }
