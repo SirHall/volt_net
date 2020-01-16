@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
 
             auto send_writer = volt::net::make_writer();
             send_writer->write_msg(t);
+            send_writer->end_msg();
 
             if (auto net = net_weak.lock())
             {

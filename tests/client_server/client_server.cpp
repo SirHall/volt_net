@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
             auto writer = volt::net::msg_writer();
 
             writer.write_msg(send_val);
+            writer.end_msg();
 
             {
                 auto net_lock = network->get_guard();

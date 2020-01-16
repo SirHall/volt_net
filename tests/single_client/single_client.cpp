@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 
                 auto writer = volt::net::make_writer();
                 writer->write_msg(t);
+                writer->end_msg();
 
                 network->get_con_index(0, net_lock)
                     ->send_msg(writer->get_msg());
