@@ -9,8 +9,10 @@ msg_writer::msg_writer() { msg = std::move(msg_pool::get_message()); }
 msg_writer::~msg_writer()
 {
     msg->resize(0);
-    msg_pool::return_message(std::move(msg));
+    msg_pool::return_message(msg);
 }
+
+void msg_writer::end_msg() { volt::net::serialize::end_msg(this->msg); }
 
 message_ptr const &msg_writer::get_msg() const { return msg; }
 

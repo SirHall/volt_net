@@ -51,6 +51,8 @@ namespace volt::net
             serialize::write_into<T>(instance, msg);
         }
 
+        void end_msg();
+
         /**
          * @brief Get the message object
          *

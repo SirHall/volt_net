@@ -17,7 +17,7 @@ message_ptr volt::net::msg_pool::get_message()
             return msg;
         }
     }
-    return std::move(make_message());
+    return make_message();
 }
 
 void volt::net::msg_pool::return_message(message_ptr msg)
