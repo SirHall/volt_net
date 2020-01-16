@@ -28,7 +28,7 @@ namespace volt::net
 
     typedef std::vector<net_word>::iterator        message_iter;
     typedef std::vector<net_word>                  message_t;
-    typedef std::unique_ptr<std::vector<net_word>> message_ptr;
+    typedef std::shared_ptr<std::vector<net_word>> message_ptr;
 
     // Returns a new instance of a message pointer
     message_ptr make_message();
