@@ -77,8 +77,6 @@ namespace volt::net
         message_ptr           recv_msg; // The message currently being built
         bool                  next_is_escape =
             false; // Is the next character being read an escape sequence?
-        std::mutex            send_buff_mut;
-        std::vector<net_word> send_buff;
 
         std::vector<message_ptr> recieved_messages;
 
@@ -118,7 +116,7 @@ namespace volt::net
                 con_id                                   connection_id);
 
         void handle_write(const boost::system::error_code &err,
-                          std::size_t                      bytes_transferred);
+                          std::size_t bytes_transferred, message_ptr msg);
 
         void handle_read(const boost::system::error_code &err,
                          std::size_t                      bytes_transferred);
@@ -158,7 +156,7 @@ namespace volt::net
          * @return true The message was sent successfully
          * @return false The message could not be sent
          */
-        void send_msg(message_ptr const &m);
+        void send_msg(message_ptr m);
 
 #pragma endregion
 

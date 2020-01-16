@@ -153,41 +153,29 @@ void net_con::handle_read(const boost::system::error_code &err,
     }
 }
 
-void net_con::send_msg(message_ptr const &m)
+void net_con::send_msg(message_ptr m)
 {
-    // We could have messages coming in from many different threads
-    auto send_buff_lock = std::lock_guard(this->send_buff_mut);
-
-    send_buff.resize(0);
-    for (std::size_t i = 0; i < m->size(); i++)
-    {
-        send_buff.push_back(m->at(i));
-        if (m->at(i) == escape_val)
-            send_buff.push_back(msg_origi_char);
-    }
-
-    send_buff.push_back(escape_val);
-    send_buff.push_back(msg_end_escaped);
-
-    boost::asio::write(sock, boost::asio::buffer(this->send_buff));
-    // TODO: Use async send
-    // boost::asio::async_write(
-    //    sock, boost::asio::buffer(this->send_buff),
-    //    boost::asio::bind_executor(
-    //        send_strand,
-    //        boost::bind(&net_con::handle_write, this,
-    //                    boost::asio::placeholders::error,
-    //                    boost::asio::placeholders::bytes_transferred)));
+    boost::asio::async_write(
+        sock, boost::asio::buffer(*m),
+        boost::asio::bind_executor(
+            send_strand,
+            boost::bind(&net_con::handle_write, this,
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred, m)));
 }
 
 void net_con::handle_write(const boost::system::error_code &err,
-                           std::size_t                      bytes_transferred)
+                           std::size_t bytes_transferred, message_ptr msg)
 {
     if (err)
     {
         std::cout << "Error occurred while trying to send message" << std::endl;
         // this->close_con();
     }
+
+    // We have a copy of the message shared pointer so only when the message is
+    // sent will we free it. In turn, when all the messages have been sent, the
+    // message will be cleaned.
 }
 
 bool net_con::is_open() { return this->con_open.load(); }
