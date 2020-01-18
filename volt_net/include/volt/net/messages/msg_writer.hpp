@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef msg_writer_hpp
 #define msg_writer_hpp
 
@@ -59,7 +59,7 @@ namespace volt::net
          * @return volt::message_ptr& The message instance that this writer is
          * holding
          */
-        message_ptr const &get_msg() const;
+        message_ptr get_msg();
     };
 
     typedef std::unique_ptr<msg_writer> writer_ptr;
