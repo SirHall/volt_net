@@ -15,7 +15,7 @@ network::network(std::size_t thread_count, bool defer_received_msgs)
       received_msgs(defer_received_msgs, [=](message_ptr msg) {
           if (this->new_msg_callback)
           {
-              this->new_msg_callback(make_reader(std::move(msg)));
+              this->new_msg_callback(make_reader(msg));
           }
       })
 {
@@ -69,7 +69,7 @@ void network::add_connection(std::unique_ptr<net_con>                     con,
 {
     con->set_new_msg_callback([&](con_id id, message_ptr msg) {
         auto net_lock = this->get_guard();
-        this->received_msgs.submit_message(std::move(msg));
+        this->received_msgs.submit_message(msg);
     });
     con->set_closed_callback([&](con_id id) {
         auto net_lock = this->get_guard();
