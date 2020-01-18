@@ -128,7 +128,7 @@ void net_con::handle_read(const boost::system::error_code &err,
                     default:
                         // TODO: Throw some 'unrecognized escape sequence' error
                         std::cerr << "Received unrecognized escape sequence: "
-                                  << next_byte << std::endl;
+                                  << (int)next_byte << std::endl;
                         break;
                 }
                 // We finished the escape sequence
@@ -171,6 +171,11 @@ void net_con::handle_write(const boost::system::error_code &err,
     {
         std::cout << "Error occurred while trying to send message" << std::endl;
         // this->close_con();
+    }
+
+    if (bytes_transferred < msg->size())
+    {
+        throw std::runtime_error("bytes_transferred < msg->size()");
     }
 
     // We have a copy of the message shared pointer so only when the message is
