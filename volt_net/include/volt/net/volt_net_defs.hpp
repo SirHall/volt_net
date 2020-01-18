@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef volt_net_defs_hpp
 #define volt_net_defs_hpp
 
