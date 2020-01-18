@@ -1,4 +1,4 @@
-#include "volt/net/messages/msg_pool.hpp"
+﻿#include "volt/net/messages/msg_pool.hpp"
 
 using namespace volt::net;
 
@@ -14,18 +14,24 @@ message_ptr volt::net::msg_pool::get_message()
         {
             message_ptr msg = std::move(msg_vec.back());
             msg_vec.pop_back();
-            return msg;
+            return std::move(msg);
         }
     }
-    return make_message();
+    return std::shared_ptr<std::vector<net_word>>(
+        new std::vector<net_word>(),
+        [=](std::vector<net_word> *msg) { msg_pool::return_message(msg); });
 }
 
 void volt::net::msg_pool::return_message(std::vector<net_word> *msg)
 {
     std::lock_guard guard(mut);
-    if (msg_vec.size() >= max_messages)
+    if (msg_vec.size() <= max_messages)
+    {
+        msg->resize(0);
         msg_vec.push_back(std::shared_ptr<std::vector<net_word>>(msg));
+    }
     else
+    {
         delete msg;
-    // Otherwise, just destroy the message
+    } // Otherwise, just destroy the message
 }
