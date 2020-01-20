@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     while (!error_quit)
     {
         std::string chat_msg = "";
-        std::cin >> chat_msg;
+        std::getline(std::cin, chat_msg);
 
         if (chat_msg == "quit" || chat_msg == "exit")
         {
