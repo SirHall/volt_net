@@ -374,6 +374,19 @@ namespace volt::net::deserialize
      */
     template <>
     void read_into(message_iter &iterator, std::string &instance);
+
+    /**
+     * @brief Reads a vector from the message
+     *
+     * @tparam  std::vector<T>
+     * @param iterator The message to read from
+     * @param instance The instance to read into
+     */
+    template <typename T>
+    void read_into(message_iter &iterator, std::vector<T> &instance)
+    {
+    }
+
 } // namespace volt::net::deserialize
 
 #endif

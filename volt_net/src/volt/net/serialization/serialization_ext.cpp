@@ -145,55 +145,55 @@ void deserialize::read_into_int(message_iter &iterator, T &instance)
 template <>
 void deserialize::read_into(message_iter &iterator, char &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<char>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::uint8_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::uint8_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::int8_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::int8_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::uint16_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::uint16_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::int16_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::int16_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::uint32_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::uint32_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::int32_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::int32_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::uint64_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::uint64_t>(iterator, instance);
 }
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::int64_t &instance)
 {
-    read_into_int(iterator, instance);
+    read_into_int<std::int64_t>(iterator, instance);
 }
 
 #pragma endregion
