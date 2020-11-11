@@ -9,7 +9,8 @@ namespace volt::net
     // Source: https://stackoverflow.com/a/1001373
     constexpr bool is_big_endian()
     {
-        union {
+        union
+        {
             std::uint32_t i;
             char          c[4];
         } be_test = {0x01020304};
