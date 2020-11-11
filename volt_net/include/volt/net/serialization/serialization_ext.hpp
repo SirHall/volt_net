@@ -4,7 +4,11 @@
 
 #include "volt/net/serialization/net_serialize.hpp"
 #include "volt/net/volt_net_defs.hpp"
+#include <array>
+#include <list>
+#include <pair>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -163,6 +167,85 @@ namespace volt::net::serialize
      */
     template <>
     void write_into(double const &v, message_ptr &data);
+
+    // I'm aware that it may be better to implement this more 'generically',
+    // though there are many instances where it would simply be better to
+    // implement a structure-specific serialization/deserialization function,
+    // for example with linked lists. It's better to write only each node's
+    // data, instead of the nodes themselves.
+
+    /**
+     * @brief Writes a vector to the message
+     *
+     * @tparam  std::vector<T>
+     * @param v The value to write to the message
+     * @param data The message to write to
+     */
+    template <typename T>
+    void write_into(std::vector<T> const &v, message_ptr &data)
+    {
+        serialize::write_into(std::uint64_t(v.size()), data);
+        for (auto const &elem : v)
+            serialize::write_into(elem, data);
+    }
+
+    /**
+     * @brief Writes an array to the message
+     *
+     * @tparam  std::array<T>
+     * @param v The value to write to the message
+     * @param data The message to write to
+     */
+    template <typename T>
+    void write_into(std::array<T> const &v, message_ptr &data)
+    {
+        serialize::write_into(std::uint64_t(v.size()), data);
+        for (auto const &elem : v)
+            serialize::write_into(elem, data);
+    }
+
+    /**
+     * @brief Writes a pair to the message
+     *
+     * @tparam  std::pair<TA, TB>
+     * @param v The value to write to the message
+     * @param data The message to write to
+     */
+    template <typename TA, typename TB>
+    void write_into(std::pair<TA, TB> const &v, message_ptr &data)
+    {
+        serialize::write_into(std::get<0>(v), data);
+        serialize::write_into(std::get<1>(v), data);
+    }
+
+    /**
+     * @brief Writes a series of values with differing types to the message
+     *
+     * @tparam T, Ts...
+     * @param v The value to write to the message
+     * @param vs All other parameters to be written
+     * @param data The message to write to
+     */
+    template <typename T, typename... Ts>
+    void write_into(T const &v, Ts... const &vs, message_ptr &data)
+    {
+        serialize::write_into(v, data);
+        write_into(Ts..., data);
+    }
+
+    /**
+     * @brief Writes a tuple to the message
+     *
+     * @tparam T, Ts...
+     * @param v The value to write to the message
+     * @param vs All other parameters to be written
+     * @param data The message to write to
+     */
+    template <typename T, typename... Ts>
+    void write_into(std::tuple<T, Ts...> const &v, message_ptr &data)
+    {
+        serialize::write_into(T, Ts..., data);
+    }
 
 } // namespace volt::net::serialize
 
