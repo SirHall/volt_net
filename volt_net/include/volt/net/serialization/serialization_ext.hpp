@@ -6,10 +6,10 @@
 #include "volt/net/volt_net_defs.hpp"
 #include <array>
 #include <list>
-#include <pair>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace volt::net::serialize
@@ -196,8 +196,8 @@ namespace volt::net::serialize
      * @param v The value to write to the message
      * @param data The message to write to
      */
-    template <typename T>
-    void write_into(std::array<T> const &v, message_ptr &data)
+    template <typename T, std::size_t Len>
+    void write_into(std::array<T, Len> const &v, message_ptr &data)
     {
         serialize::write_into(std::uint64_t(v.size()), data);
         for (auto const &elem : v)
@@ -227,10 +227,10 @@ namespace volt::net::serialize
      * @param data The message to write to
      */
     template <typename T, typename... Ts>
-    void write_into(T const &v, Ts... const &vs, message_ptr &data)
+    void write_into(T const &v, Ts... vs, message_ptr &data)
     {
         serialize::write_into(v, data);
-        write_into(Ts..., data);
+        write_into<Ts...>(Ts..., data);
     }
 
     /**
@@ -241,10 +241,10 @@ namespace volt::net::serialize
      * @param vs All other parameters to be written
      * @param data The message to write to
      */
-    template <typename T, typename... Ts>
-    void write_into(std::tuple<T, Ts...> const &v, message_ptr &data)
+    template <typename... Ts>
+    void write_into(std::tuple<Ts...> const &v, message_ptr &data)
     {
-        serialize::write_into(T, Ts..., data);
+        serialize::write_into(Ts..., data);
     }
 
 } // namespace volt::net::serialize
