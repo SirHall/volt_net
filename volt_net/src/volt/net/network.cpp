@@ -1,7 +1,6 @@
 ﻿#include "volt/net/network.hpp"
 
 #include <algorithm>
-#include <iostream>
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
@@ -28,7 +27,6 @@ network::network(std::size_t thread_count, bool defer_received_msgs)
             {
                 io_lock->run();
             }
-            std::cout << "Network worker thread closing" << std::endl;
         }));
     }
 }
@@ -56,7 +54,6 @@ network::~network()
     this->io->stop();
     for (auto &thr : this->thr_pool)
         thr.join();
-    std::cout << "Joined all network worker threads" << std::endl;
 }
 
 std::lock_guard<std::recursive_mutex> network::get_guard()
@@ -138,8 +135,6 @@ std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>
 
                 if (err)
                 {
-                    std::cerr << "Error while resolving:\n\t" << err.message()
-                              << std::endl;
                     state->SetState(ServerConnectStatus::Failed);
                     return;
                 }
@@ -149,8 +144,6 @@ std::shared_ptr<AsyncStateHandler<ServerConnectStatus>>
 
                 if (err)
                 {
-                    std::cerr << "Error while connecting:\n\t" << err.message()
-                              << std::endl;
                     state->SetState(ServerConnectStatus::Failed);
                     return;
                 }
@@ -204,16 +197,11 @@ void network::start_listening(std::uint16_t hostport_ipv4,
                     },
                     std::placeholders::_1, this->self, this->io),
                 this->io);
-            if (!net_listener->is_open())
-            {
-                std::cerr << "Failed to open listener" << std::endl;
-            }
+            if (!net_listener->is_open()) {}
         }
     }
     catch (std::exception &e)
     {
-        std::cerr << "Error occurred while trying to open listener:\n\t"
-                  << e.what() << std::endl;
     }
 }
 

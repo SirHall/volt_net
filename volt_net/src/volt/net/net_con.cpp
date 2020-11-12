@@ -6,7 +6,6 @@
 #include "volt/net/volt_net_defs.hpp"
 
 #include <assert.h>
-#include <iostream>
 #include <string>
 
 using namespace volt::net;
@@ -38,8 +37,6 @@ void net_con::close_con()
 
 bool net_con::get_next_byte(net_word &next_byte)
 {
-    // std::cout << (msg_size == 0) << " " << (current_index >= msg_size) << " "
-    //           << !this->is_open() << std::endl;
     if ((msg_size == 0) || (current_index >= msg_size) || !this->is_open())
     {
         current_index = 0;
@@ -64,7 +61,6 @@ net_con::net_con(tcp::socket                              connected_socket,
 net_con::~net_con()
 {
     this->close_con();
-    std::cout << "NetCon closed" << std::endl;
     // using namespace volt::event;
     // global_event<e_closed_con>::call_event(e_closed_con(this->get_con_id()));
 }
@@ -127,8 +123,6 @@ void net_con::handle_read(const boost::system::error_code &err,
                         break;
                     default:
                         // TODO: Throw some 'unrecognized escape sequence' error
-                        std::cerr << "Received unrecognized escape sequence: "
-                                  << (int)next_byte << std::endl;
                         break;
                 }
                 // We finished the escape sequence
@@ -143,12 +137,10 @@ void net_con::handle_read(const boost::system::error_code &err,
     }
     else if (err == boost::asio::error::eof)
     {
-        std::cout << "Connection closed" << std::endl;
         this->close_con();
     }
     else
     {
-        std::cout << "Error with reading" << std::endl;
         this->close_con();
     }
 }
@@ -167,11 +159,7 @@ void net_con::send_msg(message_ptr m)
 void net_con::handle_write(const boost::system::error_code &err,
                            std::size_t bytes_transferred, message_ptr msg)
 {
-    if (err)
-    {
-        std::cout << "Error occurred while trying to send message" << std::endl;
-        // this->close_con();
-    }
+    if (err) {}
 
     if (bytes_transferred < msg->size())
     {

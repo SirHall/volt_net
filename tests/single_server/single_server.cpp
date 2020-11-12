@@ -3,7 +3,6 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
-#include <iostream>
 #include <signal.h>
 #include <string>
 #include <thread>
@@ -40,11 +39,7 @@ static std::atomic_bool error_quit = false;
 // static int        msgs_recieved = 0;
 // static std::mutex cnt_mut;
 
-void handle_close(int s)
-{
-    std::cout << "\n\tForcefully Closing server (" << s << ")" << std::endl;
-    error_quit = true;
-}
+void handle_close(int s) { error_quit = true; }
 
 void send_all(test &t)
 {
@@ -62,7 +57,6 @@ int main(int argc, char *argv[])
            std::weak_ptr<volt::net::network> net_weak) {
             test t = test();
             reader->read_msg(t);
-            std::cout << t.user << ": " << t.chat_msg << std::endl;
 
             auto send_writer = volt::net::make_writer();
             send_writer->write_msg(t);
@@ -80,8 +74,6 @@ int main(int argc, char *argv[])
         },
         std::placeholders::_1, network->get_net_weak()));
 
-    std::cout << "Server launched" << std::endl;
-
     {
         auto net_lock = network->get_guard();
         network->start_listening(64430, 64431, net_lock);
@@ -98,6 +90,5 @@ int main(int argc, char *argv[])
         auto net_lock = network->get_guard();
         network->close(net_lock);
     }
-    std::cout << "End of main()" << std::endl;
     return 0;
 }

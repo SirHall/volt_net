@@ -14,13 +14,6 @@
 
 namespace volt::net::serialize
 {
-    // template <>
-    // void write_into(net_word const &v, volt::message_ptr &data)
-    // {
-    //     // std::cout << "Write: " << (int)v << std::endl;
-    //     data->push_back(v);
-    // }
-
     // These functions are declared below
     /**
      * @brief Writes a message array size to the message

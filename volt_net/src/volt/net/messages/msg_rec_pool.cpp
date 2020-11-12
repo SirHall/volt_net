@@ -1,8 +1,6 @@
 ﻿#include "volt/net/messages/msg_rec_pool.hpp"
 #include "volt/net/messages/msg_reader.hpp"
 
-#include <iostream>
-
 using namespace volt::net;
 
 msg_rec_pool::msg_rec_pool(
