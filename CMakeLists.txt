@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.5)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HunterGate.cmake)
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.283.tar.gz"
+    SHA1 "f445fbb4716e5485e83f6acf110b51d3b8916b2c"
+)
+
 project(volt_ge_net)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
-
 # Setup Conan
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-message(STATUS "Libs: ${CONAN_LIBS}")
+# include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+# conan_basic_setup()
+# message(STATUS "Libs: ${CONAN_LIBS}")
 
 # Add in volt_net
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/volt_net/)

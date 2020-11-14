@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 # Set some default values
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(CMAKE_CXX_STANDARD 17)
 
 # Setup and include libraries
 # We use Boost.asio so we can later transition more easily to the C++ Networking TS library.
@@ -17,10 +16,13 @@ file(GLOB_RECURSE SRCS
 )
 
 find_package (Threads)
+hunter_add_package(Boost)
+find_package(Boost CONFIG REQUIRED)
 
 add_library(volt_net ${SRCS})
 target_include_directories(volt_net PUBLIC ${INCLUDE_DIR})
-target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(volt_net ${CONAN_LIBS})
+target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost)
+# target_link_libraries(volt_net ${CONAN_LIBS})
+set_property(TARGET volt_gfx PROPERTY CXX_STANDARD 17)
 
 # endif()
