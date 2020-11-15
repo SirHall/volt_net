@@ -23,6 +23,6 @@ add_library(volt_net ${SRCS})
 target_include_directories(volt_net PUBLIC ${INCLUDE_DIR})
 target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost)
 # target_link_libraries(volt_net ${CONAN_LIBS})
-set_property(TARGET volt_gfx PROPERTY CXX_STANDARD 17)
+set_property(TARGET volt_net PROPERTY CXX_STANDARD 17)
 
 # endif()
