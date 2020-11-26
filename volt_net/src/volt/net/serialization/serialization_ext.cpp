@@ -1,4 +1,5 @@
 #include "volt/net/serialization/serialization_ext.hpp"
+#include <limits>
 
 using namespace volt::net;
 

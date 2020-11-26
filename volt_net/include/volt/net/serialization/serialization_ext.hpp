@@ -220,7 +220,7 @@ namespace volt::net::serialize
     void write_into(T const &v, Ts... vs, message_ptr &data)
     {
         write_into(v, data);
-        write_into<Ts...>(Ts..., data);
+        write_into(vs..., data);
     }
 
     /**
@@ -234,7 +234,8 @@ namespace volt::net::serialize
     template <typename... Ts>
     void write_into(std::tuple<Ts...> const &v, message_ptr &data)
     {
-        write_into(Ts..., data);
+        // write_into(v..., data);
+        std::apply(write_into, v, data);
     }
 
 } // namespace volt::net::serialize
@@ -389,7 +390,7 @@ namespace volt::net::deserialize
     void read_into(message_iter &iterator, std::array<T, Len> &instance)
     {
         for (std::size_t i = 0; i < instance.size(); i++)
-            serialize::read_into(iterator, instance[i]);
+            deserialize::read_into(iterator, instance[i]);
     }
 
     /**
@@ -402,8 +403,8 @@ namespace volt::net::deserialize
     template <typename TA, typename TB>
     void read_into(message_iter &iterator, std::pair<TA, TB> &instance)
     {
-        serialize::read_into<TA>(iterator, std::get<0>(instance));
-        serialize::read_into<TA>(iterator, std::get<1>(instance));
+        deserialize::read_into<TA>(iterator, std::get<0>(instance));
+        deserialize::read_into<TA>(iterator, std::get<1>(instance));
     }
 
     /**
@@ -416,8 +417,8 @@ namespace volt::net::deserialize
     template <typename T, typename... Ts>
     void read_into(message_iter &iterator, T &instance, Ts... Is)
     {
-        serialize::read_into<T>(iterator, instance);
-        serialize::read_into<Ts...>(iterator, Is);
+        deserialize::read_into(iterator, instance);
+        deserialize::read_into(iterator, Is...);
     }
 
     /**
@@ -430,7 +431,7 @@ namespace volt::net::deserialize
     template <typename... Ts>
     void read_into(message_iter &iterator, Ts... Is)
     {
-        serialize::read_into<Ts...>(iterator, Is);
+        deserialize::read_into(iterator, Is...);
     }
 
 } // namespace volt::net::deserialize
