@@ -15,13 +15,20 @@ file(GLOB_RECURSE SRCS
     RELATIVE_PATH
 )
 
-find_package (Threads)
+# Threading
+find_package(Threads)
+
+# Boost
 hunter_add_package(Boost)
 find_package(Boost CONFIG REQUIRED)
 
+# volt_event
+hunter_add_package(volt_event)
+find_package(volt_event CONFIG REQUIRED)
+
 add_library(volt_net ${SRCS})
 target_include_directories(volt_net PUBLIC ${INCLUDE_DIR})
-target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost)
+target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost volt_event)
 # target_link_libraries(volt_net ${CONAN_LIBS})
 set_property(TARGET volt_net PROPERTY CXX_STANDARD 17)
 
