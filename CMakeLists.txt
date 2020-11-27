@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HunterGate.cmake)
-
-HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.284.tar.gz"
-    SHA1 "b15e14b31d96ee2e2be32187d21e2390d0b974c8"
-    FILEPATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Hunter/config.cmake"
-)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/volt_hunt.cmake)
 
 # set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/inst/") # For testing
 
