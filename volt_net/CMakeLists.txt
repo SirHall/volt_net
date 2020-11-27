@@ -14,7 +14,6 @@ find_package(Threads)
 # Boost
 hunter_add_package(Boost)
 find_package(Boost CONFIG REQUIRED)
-
 # volt_event
 hunter_add_package(volt_event)
 find_package(volt_event CONFIG REQUIRED)
