@@ -8,7 +8,9 @@ HunterGate(
     FILEPATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Hunter/config.cmake"
 )
 
-project(volt_ge_net)
+# set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/inst/") # For testing
+
+project(volt_net VERSION 0.0.1)
 
 # Setup Conan
 # include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -41,7 +43,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/volt_net/)
 
 enable_testing()
 
-# Add in tests
+# Add in examples
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests/client_server/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests/single_server/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests/single_client/)
