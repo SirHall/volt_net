@@ -6,16 +6,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/volt_hunt.cmake)
 
 project(volt_net VERSION 0.0.1)
 
-# Setup Conan
-# include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-# conan_basic_setup()
-# message(STATUS "Libs: ${CONAN_LIBS}")
-
 # Add in volt_net
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/volt_net/)
-
-# Add in volt_event
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/dep/volt_event/)
 
 #Setup Doxygen
 # find_package(Doxygen)

@@ -22,7 +22,6 @@ find_package(volt_event CONFIG REQUIRED)
 add_library(volt_net ${SRCS})
 target_include_directories(volt_net PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost volt_event)
-# target_link_libraries(volt_net ${CONAN_LIBS})
 set_property(TARGET volt_net PROPERTY CXX_STANDARD 17)
 
 
