@@ -3,8 +3,13 @@ cmake_minimum_required(VERSION 3.5)
 # We use Boost.asio so we can later transition more easily to the C++ Networking TS library.
 
 # Find all source files
-file(GLOB_RECURSE SRCS
+file(GLOB_RECURSE VOLT_NET_SRCS
     "src/*.cpp"
+    RELATIVE_PATH
+)
+
+file(GLOB_RECURSE VOLT_NET_HEADERS
+    "include/*.hpp"
     RELATIVE_PATH
 )
 
@@ -18,10 +23,12 @@ find_package(Boost CONFIG REQUIRED)
 hunter_add_package(volt_event)
 find_package(volt_event CONFIG REQUIRED)
 
-add_library(volt_net ${SRCS})
+add_library(volt_net ${VOLT_NET_SRCS})
 target_include_directories(volt_net PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(volt_net ${CMAKE_THREAD_LIBS_INIT} Boost::boost volt_event)
 set_property(TARGET volt_net PROPERTY CXX_STANDARD 17)
+
+set_target_properties(volt_net PROPERTIES PUBLIC_HEADER "${VOLT_NET_HEADERS}")
 
 
 
@@ -48,12 +55,13 @@ configure_package_config_file(
 
 # Don't know how much we need this given this is a header-only library
 install(
-    TARGETS              volt_net
-    EXPORT               "${TARGETS_EXPORT_NAME}"
-    LIBRARY DESTINATION  "${CMAKE_INSTALL_LIBDIR}" # Probably not needed
-    ARCHIVE DESTINATION  "${CMAKE_INSTALL_LIBDIR}" # Probably not needed
-    RUNTIME DESTINATION  "${CMAKE_INSTALL_BINDIR}" # Probably not needed
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    TARGETS                     volt_net
+    EXPORT                      "${TARGETS_EXPORT_NAME}"
+    LIBRARY         DESTINATION "${CMAKE_INSTALL_LIBDIR}" # Probably not needed
+    ARCHIVE         DESTINATION "${CMAKE_INSTALL_LIBDIR}" # Probably not needed
+    RUNTIME         DESTINATION "${CMAKE_INSTALL_BINDIR}" # Probably not needed
+    INCLUDES        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    PUBLIC_HEADER   DESTINATION "${VOLT_NET_HEADERS}"
 )
 
 # Headers
