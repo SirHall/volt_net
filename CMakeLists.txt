@@ -4,7 +4,11 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/volt_hunt.cmake)
 
 # set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/inst/") # For testing
 
-project(volt_net VERSION 0.0.2)
+project(volt_net VERSION 0.0.4)
+
+include(ExternalProject)
+set(EXTERNAL_INSTALL_LOCATION ${CMAKE_BINARY_DIR}/dep)
+include_directories(${EXTERNAL_INSTALL_LOCATION}/include)
 
 # Add in volt_net
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/volt_net/)
