@@ -1,6 +1,6 @@
 ﻿#pragma once
-#ifndef volt_net_defs_hpp
-#define volt_net_defs_hpp
+#ifndef VOLT_NET_VOLT_NET_DEFS_HPP
+#define VOLT_NET_VOLT_NET_DEFS_HPP
 
 #include <cstdint>
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef voltendian_hpp
-#define voltendian_hpp
+#ifndef VOLT_NET_VOLT_ENDIAN_HPP
+#define VOLT_NET_VOLT_ENDIAN_HPP
 
 #include <cstdint>
 

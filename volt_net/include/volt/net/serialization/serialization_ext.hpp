@@ -1,6 +1,6 @@
 #pragma once
-#ifndef serialization_ext_hpp
-#define serialization_ext_hpp
+#ifndef VOLT_NET_SERIALIZATION_SERIALIZATION_EXT_HPP
+#define VOLT_NET_SERIALIZATION_SERIALIZATION_EXT_HPP
 
 #include "volt/net/serialization/net_serialize.hpp"
 #include "volt/net/volt_net_defs.hpp"

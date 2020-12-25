@@ -1,6 +1,6 @@
 #pragma once
-#ifndef net_serialize_hpp
-#define net_serialize_hpp
+#ifndef VOLT_NET_SERIALIZATION_NET_SERIALIZE_HPP
+#define VOLT_NET_SERIALIZATION_NET_SERIALIZE_HPP
 
 #include "volt/net/volt_endian.hpp"
 #include "volt/net/volt_net_defs.hpp"

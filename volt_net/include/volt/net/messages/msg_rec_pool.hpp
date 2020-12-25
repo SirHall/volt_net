@@ -1,6 +1,6 @@
 #pragma once
-#ifndef msg_rec_pool_hpp
-#define msg_rec_pool_hpp
+#ifndef VOLT_NET_MESSAGES_MSG_REC_POOL_HPP
+#define VOLT_NET_MESSAGES_MSG_REC_POOL_HPP
 
 // #include "volt/event/global_event.hpp"
 #include "volt/net/volt_net_defs.hpp"

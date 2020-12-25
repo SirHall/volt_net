@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LISTENER_HPP
-#define LISTENER_HPP
+#ifndef VOLT_NET_LISTENER_HPP
+#define VOLT_NET_LISTENER_HPP
 
 #include "volt/net/net_con.hpp"
 

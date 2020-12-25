@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ASYNCSTATEHANDLER_HPP
-#define ASYNCSTATEHANDLER_HPP
+#ifndef VOLT_NET_ASYNCSTATEHANDLER_HPP
+#define VOLT_NET_ASYNCSTATEHANDLER_HPP
 
 #include <atomic>
 #include <memory>

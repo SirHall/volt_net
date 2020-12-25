@@ -1,6 +1,6 @@
 #pragma once
-#ifndef msg_pool_hpp
-#define msg_pool_hpp
+#ifndef VOLT_NET_MESSAGES_MSG_POOL_HPP
+#define VOLT_NET_MESSAGES_MSG_POOL_HPP
 
 #include "volt/net/volt_net_defs.hpp"
 #include <memory>

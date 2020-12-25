@@ -1,6 +1,6 @@
 ﻿#pragma once
-#ifndef connection_hpp
-#define connection_hpp
+#ifndef VOLT_NET_CONNECTION_HPP
+#define VOLT_NET_CONNECTION_HPP
 
 // #include <netinet/in.h>
 // #include <poll.h>

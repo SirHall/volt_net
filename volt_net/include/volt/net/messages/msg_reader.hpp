@@ -1,6 +1,6 @@
 #pragma once
-#ifndef msg_reader_hpp
-#define msg_reader_hpp
+#ifndef VOLT_NET_MESSAGES_MSG_READER_HPP
+#define VOLT_NET_MESSAGES_MSG_READER_HPP
 
 #include "volt/net/messages/msg_pool.hpp"
 #include "volt/net/serialization/net_serialize.hpp"

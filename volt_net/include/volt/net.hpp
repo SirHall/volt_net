@@ -1,6 +1,6 @@
 #pragma once
-#ifndef net_hpp
-#define net_hpp
+#ifndef VOLT_NET_NET_HPP
+#define VOLT_NET_NET_HPP
 
 #include "volt/net/AsyncStateHandler.hpp"
 #include "volt/net/listener.hpp"
