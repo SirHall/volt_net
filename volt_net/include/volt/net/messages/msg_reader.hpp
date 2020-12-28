@@ -51,7 +51,7 @@ namespace volt::net
         template <typename T>
         void read_msg(T &instance)
         {
-            volt::net::deserialize::read_into<T>(iter, instance);
+            volt::net::deserialize::read_into(iter, instance);
         }
 
         /**
@@ -64,7 +64,7 @@ namespace volt::net
         template <typename T>
         void read_msg_int(T &instance)
         {
-            volt::net::deserialize::read_into_int<T>(iter, instance);
+            volt::net::deserialize::read_into_int(iter, instance);
         }
     };
 

@@ -48,7 +48,7 @@ namespace volt::net
         template <typename T>
         void write_msg(T const &instance)
         {
-            volt::net::serialize::write_into<T>(instance, msg);
+            volt::net::serialize::write_into(instance, msg);
         }
 
         void end_msg();
