@@ -8,11 +8,6 @@ file(GLOB_RECURSE VOLT_NET_SRCS
     RELATIVE_PATH
 )
 
-file(GLOB_RECURSE VOLT_NET_HEADERS
-    "include/*.hpp"
-    RELATIVE_PATH
-)
-
 # Threading
 find_package(Threads)
 
@@ -27,9 +22,6 @@ add_library(volt_net ${VOLT_NET_SRCS})
 target_include_directories(volt_net PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_link_libraries(volt_net PUBLIC ${CMAKE_THREAD_LIBS_INIT} Boost::boost volt_event)
 set_property(TARGET volt_net PROPERTY CXX_STANDARD 17)
-
-set_target_properties(volt_net PROPERTIES PUBLIC_HEADER "${VOLT_NET_HEADERS}")
-
 
 
 include(GNUInstallDirs)
@@ -61,7 +53,6 @@ install(
     ARCHIVE         DESTINATION "${CMAKE_INSTALL_LIBDIR}" # Probably not needed
     RUNTIME         DESTINATION "${CMAKE_INSTALL_BINDIR}" # Probably not needed
     INCLUDES        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    # PUBLIC_HEADER   DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 )
 
 # Headers
