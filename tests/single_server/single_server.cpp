@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     auto network = volt::net::network::create(8, false);
     // When we receive a message, reflect it to all clients
     network->set_new_msg_callback(std::bind(
-        [](volt::net::reader_ptr             reader,
+        [](volt::net::con_id id, volt::net::reader_ptr reader,
            std::weak_ptr<volt::net::network> net_weak) {
             test t = test();
             reader->read_msg(t);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
                 }
             }
         },
-        std::placeholders::_1, network->get_net_weak()));
+        std::placeholders::_1, std::placeholders::_2, network->get_net_weak()));
 
     {
         auto net_lock = network->get_guard();

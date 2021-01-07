@@ -80,15 +80,16 @@ int main(int argc, char *argv[])
     send_val.s = "Msg sent correctly";
 
     auto network = volt::net::network::create(8, true);
-    network->set_new_msg_callback([](volt::net::reader_ptr reader) {
-        test t = test();
-        reader->read_msg(t);
-        std::cout << "a: " << t.a << std::endl;
-        // std::cout << "b: " << t.b << std::endl;
-        std::cout << "c: " << t.c << std::endl;
-        std::cout << "s: " << t.s << std::endl;
-        std::cout << std::endl;
-    });
+    network->set_new_msg_callback(
+        [](volt::net::con_id id, volt::net::reader_ptr reader) {
+            test t = test();
+            reader->read_msg(t);
+            std::cout << "a: " << t.a << std::endl;
+            // std::cout << "b: " << t.b << std::endl;
+            std::cout << "c: " << t.c << std::endl;
+            std::cout << "s: " << t.s << std::endl;
+            std::cout << std::endl;
+        });
 
     std::cout << "Server launched" << std::endl;
 

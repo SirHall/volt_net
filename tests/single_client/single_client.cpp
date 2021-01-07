@@ -51,11 +51,12 @@ int main(int argc, char *argv[])
     std::cin >> username;
 
     auto network = volt::net::network::create(8, false);
-    network->set_new_msg_callback([](volt::net::reader_ptr reader) {
-        test t = test();
-        reader->read_msg(t);
-        std::cout << t.user << ": " << t.chat_msg << std::endl;
-    });
+    network->set_new_msg_callback(
+        [](volt::net::con_id id, volt::net::reader_ptr reader) {
+            test t = test();
+            reader->read_msg(t);
+            std::cout << t.user << ": " << t.chat_msg << std::endl;
+        });
 
     auto con_status = network->server_connect("127.0.0.1", "64430");
     int  dot_count  = 1;
