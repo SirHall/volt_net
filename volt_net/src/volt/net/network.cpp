@@ -11,11 +11,9 @@ network::network(std::size_t thread_count, bool defer_received_msgs)
     : running(true), io(std::make_shared<boost::asio::io_context>()),
       work(boost::asio::make_work_guard(io->get_executor())),
       net_listener(nullptr),
-      received_msgs(defer_received_msgs, [=](message_ptr msg) {
+      received_msgs(defer_received_msgs, [=](con_id id, message_ptr msg) {
           if (this->new_msg_callback)
-          {
-              this->new_msg_callback(make_reader(msg));
-          }
+              this->new_msg_callback(id, make_reader(msg));
       })
 {
     this->thr_pool.reserve(thread_count);
@@ -66,7 +64,7 @@ void network::add_connection(std::unique_ptr<net_con>                     con,
 {
     con->set_new_msg_callback([&](con_id id, message_ptr msg) {
         auto net_lock = this->get_guard();
-        this->received_msgs.submit_message(msg);
+        this->received_msgs.submit_message(id, msg);
     });
     con->set_closed_callback([&](con_id id) {
         auto net_lock = this->get_guard();
@@ -216,7 +214,8 @@ con_id network::get_next_id()
     return new_con_id;
 }
 
-void network::set_new_msg_callback(std::function<void(reader_ptr)> callback)
+void network::set_new_msg_callback(
+    std::function<void(con_id, reader_ptr)> callback)
 {
     this->new_msg_callback = callback;
 }
