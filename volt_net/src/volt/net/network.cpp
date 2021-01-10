@@ -68,18 +68,21 @@ void network::add_connection(std::unique_ptr<net_con>                     con,
     });
     con->set_closed_callback([&](con_id id) {
         auto net_lock = this->get_guard();
+        if (this->closed_connection_callback)
+            this->closed_connection_callback(*con);
         if (!this->running.load())
             return; // We don't want to delete the net_con object twice
         auto con_pos = std::find_if(
             this->connections.begin(), this->connections.begin(),
             [=](connection_ptr &con) { return con->get_con_id() == id; });
+        // Remove this connection from the list
         if (con_pos != this->connections.end())
-        {
-            // Remove this connection from the list
             this->connections.erase(con_pos);
-        }
     });
+
     this->connections.push_back(std::move(con));
+    if (this->new_connection_callback)
+        this->new_connection_callback(*con);
 }
 
 connection_ptr &
@@ -218,6 +221,18 @@ void network::set_new_msg_callback(
     std::function<void(con_id, reader_ptr)> callback)
 {
     this->new_msg_callback = callback;
+}
+
+void network::set_new_connection_callback(
+    std::function<void(net_con &)> callback)
+{
+    this->new_connection_callback = callback;
+}
+
+void network::set_closed_connection_callback(
+    std::function<void(net_con &)> callback)
+{
+    this->closed_connection_callback = callback;
 }
 
 void network::process_new_msgs() { this->received_msgs.notify_listeners(); }

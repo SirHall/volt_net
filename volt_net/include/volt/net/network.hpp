@@ -36,6 +36,8 @@ namespace volt::net
         std::unique_ptr<listener>               net_listener;
         msg_rec_pool                            received_msgs;
         std::function<void(con_id, reader_ptr)> new_msg_callback;
+        std::function<void(net_con &)>          new_connection_callback;
+        std::function<void(net_con &)>          closed_connection_callback;
 
         network(std::size_t thread_count, bool defer_received_msgs);
 
@@ -76,6 +78,12 @@ namespace volt::net
 
         void set_new_msg_callback(
             std::function<void(con_id, reader_ptr)> callback);
+
+        void set_new_connection_callback(
+            std::function<void(net_con &)> callback);
+
+        void set_closed_connection_callback(
+            std::function<void(net_con &)> callback);
 
         void process_new_msgs();
 
