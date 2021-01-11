@@ -105,6 +105,18 @@ void serialize::write_into(std::string const &v, message_ptr &data)
 }
 
 template <>
+void serialize::write_into(float const &v, message_ptr &data)
+{
+    if (std::numeric_limits<float>::is_iec559)
+    {
+        write_into_byte_array((net_word *)&v, ((net_word *)&v) + sizeof(double),
+                              data, true, false);
+        return;
+    }
+    // Not IEEE 574 format, build representation manually
+}
+
+template <>
 void serialize::write_into(double const &v, message_ptr &data)
 {
     if (std::numeric_limits<double>::is_iec559)
@@ -222,4 +234,31 @@ void deserialize::read_into(message_iter &iterator, std::string &instance)
     deserialize::read_into_array<char>(iterator, char_vec);
     for (char c : char_vec)
         instance += c;
+}
+
+// TODO: The way the floats and doubles are deserialized is very unreliable
+// across different machines!
+
+template <>
+void deserialize::read_into(message_iter &iterator, float &instance)
+{
+    if (std::numeric_limits<float>::is_iec559)
+    {
+        deserialize::unsafe::net_to_host_endian(&*iterator, sizeof(float),
+                                                &instance);
+        iterator += sizeof(float);
+    }
+    // Not IEEE 574 format, read representation manually
+}
+
+template <>
+void deserialize::read_into(message_iter &iterator, double &instance)
+{
+    if (std::numeric_limits<double>::is_iec559)
+    {
+        deserialize::unsafe::net_to_host_endian(&*iterator, sizeof(double),
+                                                &instance);
+        iterator += sizeof(double);
+    }
+    // Not IEEE 574 format, read representation manually
 }

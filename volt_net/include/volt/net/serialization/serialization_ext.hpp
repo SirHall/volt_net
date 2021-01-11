@@ -162,6 +162,16 @@ namespace volt::net::serialize
     void write_into(std::string const &v, message_ptr &data);
 
     /**
+     * @brief Writes a float to the message
+     *
+     * @tparam float
+     * @param v The value to write to the message
+     * @param data The message to write to
+     */
+    template <>
+    void write_into(float const &v, message_ptr &data);
+
+    /**
      * @brief Writes a double to the message
      *
      * @tparam  double
@@ -385,6 +395,26 @@ namespace volt::net::deserialize
      */
     template <>
     void read_into(message_iter &iterator, std::string &instance);
+
+    /**
+     * @brief Reads a float from the message
+     *
+     * @tparam  float
+     * @param iterator The message to read from
+     * @param instance The instance to read into
+     */
+    template <>
+    void read_into(message_iter &iterator, float &instance);
+
+    /**
+     * @brief Reads a double from the message
+     *
+     * @tparam  double
+     * @param iterator The message to read from
+     * @param instance The instance to read into
+     */
+    template <>
+    void read_into(message_iter &iterator, double &instance);
 
     /**
      * @brief Reads a vector from the message
