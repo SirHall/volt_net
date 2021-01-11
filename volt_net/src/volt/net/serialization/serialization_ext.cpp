@@ -88,6 +88,12 @@ void serialize::write_into(std::int64_t const &v, message_ptr &data)
 #pragma endregion
 
 template <>
+void serialize::write_into(bool const &v, message_ptr &data)
+{
+    serialize::write_into(std::uint8_t(v), data);
+}
+
+template <>
 void serialize::write_into(std::string const &v, message_ptr &data)
 {
     // TODO: Really slow
@@ -198,6 +204,14 @@ void deserialize::read_into(message_iter &iterator, std::int64_t &instance)
 }
 
 #pragma endregion
+
+template <>
+void deserialize::read_into(message_iter &iterator, bool &instance)
+{
+    std::uint8_t val;
+    deserialize::read_into(iterator, val);
+    instance = bool(val);
+}
 
 template <>
 void deserialize::read_into(message_iter &iterator, std::string &instance)

@@ -142,6 +142,16 @@ namespace volt::net::serialize
 #pragma endregion
 
     /**
+     * @brief Writes a boolean to the message
+     *
+     * @tparam bool
+     * @param v The bool to write to the message
+     * @param data The message to write to
+     */
+    template <>
+    void write_into(bool const &v, message_ptr &data);
+
+    /**
      * @brief Writes a string to the message
      *
      * @tparam std::string
@@ -355,6 +365,16 @@ namespace volt::net::deserialize
     void read_into(message_iter &iterator, std::int64_t &instance);
 
 #pragma endregion
+
+    /**
+     * @brief Reads a boolean from the message
+     *
+     * @tparam bool
+     * @param iterator The message to read from
+     * @param instance The instance to read into
+     */
+    template <>
+    void read_into(message_iter &iterator, bool &instance);
 
     /**
      * @brief Reads a string from the message
