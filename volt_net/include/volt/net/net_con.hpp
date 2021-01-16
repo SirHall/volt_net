@@ -84,10 +84,10 @@ namespace volt::net
         std::size_t current_index = 0;
         std::size_t msg_size      = 0;
 
-        std::function<void(con_id)>              con_closed_callback;
-        std::function<void(con_id, message_ptr)> new_msg_callback;
-        const con_id                             id;
-        std::atomic_bool                         is_reading = false;
+        std::function<void(con_id)>                    con_closed_callback;
+        std::function<void(con_id, message_ptr const)> new_msg_callback;
+        const con_id                                   id;
+        std::atomic_bool                               is_reading = false;
         // std::mutex _msg_mut;
         // std::mutex _send_buff_mut;
 
@@ -180,7 +180,7 @@ namespace volt::net
 
         void set_closed_callback(std::function<void(con_id)> callback);
         void set_new_msg_callback(
-            std::function<void(con_id, message_ptr)> callback);
+            std::function<void(con_id, message_ptr const)> callback);
 
 #pragma endregion
     };

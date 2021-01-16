@@ -116,8 +116,7 @@ void net_con::handle_read(const boost::system::error_code &err,
                         break;
                     case msg_end_escaped:
                         // This is the end of the message
-                        this->new_msg_callback(this->get_con_id(),
-                                               std::move(recv_msg));
+                        this->new_msg_callback(this->get_con_id(), recv_msg);
                         this->recv_msg = msg_pool::get_message();
                         this->recv_msg->resize(0);
                         break;
@@ -179,7 +178,7 @@ void net_con::set_closed_callback(std::function<void(con_id)> callback)
 }
 
 void net_con::set_new_msg_callback(
-    std::function<void(con_id, message_ptr)> callback)
+    std::function<void(con_id, message_ptr const)> callback)
 {
     this->new_msg_callback = callback;
     if (!this->is_reading.load())
