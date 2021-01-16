@@ -23,6 +23,8 @@
 - Ensure full compatibility with Windows on Cygwin and MSYS2
 - Code coverage generation
 - Add network serialization support for floats/doubles.
+- Clean up overuse of smart pointers, replace with 'the 5'
+- Refactor class names to CamelCase
 
 # Project Status
-`Cleanup`
+`Bug Fix`
