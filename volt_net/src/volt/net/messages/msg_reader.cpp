@@ -2,15 +2,13 @@
 
 using namespace volt::net;
 
-msg_reader::msg_reader(message_ptr message)
+msg_reader::msg_reader(message_ptr message) : msg(std::move(message))
 {
-    msg  = message;
     iter = msg->begin();
 }
 
-msg_reader::msg_reader()
+msg_reader::msg_reader() : msg(std::move(msg_pool::get_message()))
 {
-    msg  = msg_pool::get_message();
     iter = msg->begin();
 }
 
@@ -22,7 +20,7 @@ msg_reader::~msg_reader()
 // Global
 reader_ptr volt::net::make_reader() { return std::make_unique<msg_reader>(); }
 
-reader_ptr volt::net::make_reader(message_ptr msg)
+reader_ptr volt::net::make_reader(message_ptr const msg)
 {
-    return std::make_unique<msg_reader>(msg);
+    return std::make_unique<msg_reader>(std::move(msg));
 }

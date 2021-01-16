@@ -18,8 +18,8 @@ namespace volt::net
     class msg_reader
     {
     private:
-        message_ptr  msg;
-        message_iter iter;
+        message_ptr const msg;
+        message_iter      iter;
 
     public:
         /**
@@ -27,7 +27,7 @@ namespace volt::net
          *
          * @param message The pre-existing message for this reader to read from
          */
-        msg_reader(message_ptr message);
+        msg_reader(message_ptr const message);
 
         /**
          * @brief Construct a new msg reader without any message
@@ -83,7 +83,7 @@ namespace volt::net
      * @param msg The messahe for this reader to read from
      * @return reader_ptr A smart pointer holding the new reader instance
      */
-    reader_ptr make_reader(message_ptr msg);
+    reader_ptr make_reader(message_ptr const msg);
 } // namespace volt::net
 
 #endif
