@@ -116,7 +116,8 @@ void net_con::handle_read(const boost::system::error_code &err,
                         break;
                     case msg_end_escaped:
                         // This is the end of the message
-                        this->new_msg_callback(this->get_con_id(), recv_msg);
+                        this->new_msg_callback(this->get_con_id(),
+                                               std::move(recv_msg));
                         this->recv_msg = msg_pool::get_message();
                         this->recv_msg->resize(0);
                         break;
