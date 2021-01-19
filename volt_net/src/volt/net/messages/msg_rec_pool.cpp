@@ -21,8 +21,6 @@ void msg_rec_pool::submit_message(con_id id, message_ptr msg)
     }
     else
     {
-        // volt::event::global_event<reader_ptr>::call_event(
-        //     make_reader(std::move(msg)));
         this->on_msg_received(id, msg);
     }
 }
@@ -31,30 +29,18 @@ void msg_rec_pool::notify_listeners()
 {
     if (!defer_msg_signal)
         return;
-    while (true)
+    while (!rec_msg_vec.empty())
     {
         volt::net::message_ptr msg;
         con_id                 id = 0;
         {
             std::lock_guard lock(mut);
-            if (rec_msg_vec.size() == 0)
-            {
-                break;
-            }
-            else
-            {
-                msg = rec_msg_vec.front();
-                rec_msg_vec.pop();
-            }
-            if (rec_msg_vec.size() == 0)
-            {
-                break;
-            }
-            else
-            {
-                id = rec_msg_ids.front();
-                rec_msg_ids.pop();
-            }
+            // I am assuming that these two queue will always remain the same
+            // size
+            msg = rec_msg_vec.front();
+            rec_msg_vec.pop();
+            id = rec_msg_ids.front();
+            rec_msg_ids.pop();
         }
         this->on_msg_received(id, msg);
     }
