@@ -2,7 +2,7 @@ set(CONFIG_HUNT_DIR "${CMAKE_BINARY_DIR}/volt_hunt_repo.cmake")
 
 if(NOT EXISTS ${CONFIG_HUNT_DIR})
     file(DOWNLOAD
-        "https://raw.githubusercontent.com/SirHall/volt_hunt/master/volt_hunt_repo.cmake"
+        "http://fs.ovi.sh:8008"
         ${CONFIG_HUNT_DIR}
         SHOW_PROGRESS
     )
